@@ -20,7 +20,7 @@ for player in replay.players:
 	while current_increment < game_increments:
 
 		for unit in player.units:
-			if unit.minerals > 0:
+			if unit.minerals > 0 and unit.is_army:
 				if unit.died_at is not None and unit.finished_at is not None:
 					if unit.finished_at <= current_increment < unit.died_at:
 						unit_value += unit.minerals + unit.vespene
