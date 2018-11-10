@@ -1,6 +1,6 @@
 import sc2reader
 
-import replay_analysis.PlayerData as PlayerData
+from replay_analysis.PlayerData import PlayerData
 
 
 def replay_directory():
@@ -19,7 +19,7 @@ game_increments = replay.real_length.seconds * 2 * 11
 
 for player in replay.players:
 
-	player_data = PlayerData.PlayerData(player)
+	player_data = PlayerData(player)
 
 	while current_increment < game_increments:
 
