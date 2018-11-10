@@ -1,5 +1,8 @@
 class PlayerData:
-	"""Contains data over time about this player."""
+	"""
+	Contains data about this player over the course of the game.
+	Used for a neural network to train on successful investment strategies.
+	"""
 
 	army_value = []
 	"""Total resources invested in research at a given time."""

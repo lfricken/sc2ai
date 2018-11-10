@@ -1,3 +1,4 @@
+# Don't modify this file, this is meant as a simple example.
 import sc2reader
 
 from replay_analysis.PlayerData import PlayerData
