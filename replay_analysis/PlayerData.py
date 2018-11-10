@@ -11,7 +11,7 @@ class PlayerData:
 	technology = []
 	"""Total resources invested in the tech tree at a given time."""
 	expands = []
-	"""How many expands do we have at a given time."""
+	"""How many expand do we have at a given time."""
 	income_per_minute = []
 	"""(minerals,vespene) income per minute at a given time."""
 

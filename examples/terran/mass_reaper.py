@@ -33,7 +33,7 @@ class MassReaperBot(sc2.BotAI):
         """
         if self.supply_left < 5 and self.townhalls.exists and self.supply_used >= 14 and self.can_afford(UnitTypeId.SUPPLYDEPOT) and self.units(UnitTypeId.SUPPLYDEPOT).not_ready.amount + self.already_pending(UnitTypeId.SUPPLYDEPOT) < 1:
             ws = self.workers.gathering
-            if ws: # if workers found
+            if ws: # if worker found
                 w = ws.furthest_to(ws.center)
                 loc = await self.find_placement(UnitTypeId.SUPPLYDEPOT, w.position, placement_step=3)
                 if loc: # if a placement location was found
@@ -100,7 +100,7 @@ class MassReaperBot(sc2.BotAI):
             for rax in self.units(UnitTypeId.BARRACKS).idle:
                 self.combinedActions.append(rax.train(UnitTypeId.REAPER))
 
-        # send workers to mine from gas
+        # send worker to mine from gas
         if iteration % 25 == 0:
             await self.distribute_workers()
 
@@ -167,7 +167,7 @@ class MassReaperBot(sc2.BotAI):
             # move to random enemy start location if no enemy buildings have been seen
             self.combinedActions.append(r.move(random.choice(self.enemy_start_locations)))
             
-        # manage idle scvs, would be taken care by distribute workers aswell
+        # manage idle scvs, would be taken care by distribute worker aswell
         if self.townhalls.exists:
             for w in self.workers.idle:
                 th = self.townhalls.closest_to(w)
@@ -244,7 +244,7 @@ class MassReaperBot(sc2.BotAI):
         return 0
 
 
-    # distribute workers function rewritten, the default distribute_workers() function did not saturate gas quickly enough
+    # distribute worker function rewritten, the default distribute_workers() function did not saturate gas quickly enough
     async def distribute_workers(self, performanceHeavy=True, onlySaturateGas=False):
         # expansion_locations = self.expansion_locations
         # owned_expansions = self.owned_expansions
@@ -297,13 +297,13 @@ class MassReaperBot(sc2.BotAI):
                 # cancel early if there is nothing to balance
                 return
 
-        # check if deficit in gas less or equal than what we have in surplus, else grab some more workers from surplus bases
+        # check if deficit in gas less or equal than what we have in surplus, else grab some more worker from surplus bases
         deficitGasCount = sum(gasInfo["deficit"] for gasTag, gasInfo in deficitGeysers.items() if gasInfo["deficit"] > 0)
         surplusCount = sum(-gasInfo["deficit"] for gasTag, gasInfo in surplusGeysers.items() if gasInfo["deficit"] < 0)
         surplusCount += sum(-thInfo["deficit"] for thTag, thInfo in surplusTownhalls.items() if thInfo["deficit"] < 0)
 
         if deficitGasCount - surplusCount > 0:
-            # grab workers near the gas who are mining minerals
+            # grab worker near the gas who are mining minerals
             for gTag, gInfo in deficitGeysers.items():
                 if workerPool.amount >= deficitGasCount:
                     break
@@ -313,7 +313,7 @@ class MassReaperBot(sc2.BotAI):
                     workerPool.append(w)
                     workerPoolTags.add(w.tag)
 
-        # now we should have enough workers in the pool to saturate all gases, and if there are workers left over, make them mine at townhalls that have mineral workers deficit
+        # now we should have enough worker in the pool to saturate all gases, and if there are worker left over, make them mine at townhalls that have mineral worker deficit
         for gTag, gInfo in deficitGeysers.items():
             if performanceHeavy:
                 # sort furthest away to closest (as the pop() function will take the last element)
@@ -327,7 +327,7 @@ class MassReaperBot(sc2.BotAI):
                         self.combinedActions.append(w.gather(gInfo["unit"]))
 
         if not onlySaturateGas:
-            # if we now have left over workers, make them mine at bases with deficit in mineral workers
+            # if we now have left over worker, make them mine at bases with deficit in mineral worker
             for thTag, thInfo in deficitTownhalls.items():
                 if performanceHeavy:
                     # sort furthest away to closest (as the pop() function will take the last element)

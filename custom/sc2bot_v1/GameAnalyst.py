@@ -1,34 +1,32 @@
 import math
 
+from custom.sc2bot_v1.Investments import Investments
+
 
 class GameAnalyst:
 
-	def get_score(self, investment):
-		army_value = investment[0]
-		worker_value = investment[1]
-		expand_value = investment[2]
-		production_value = investment[3]
-		worker_count = worker_value / 50
-		expand_count = expand_value / 400
+	def get_score(self, investment: Investments) -> int:
+		worker_count = investment.worker / 50
+		expand_count = investment.expand / 400
 
 		# is expanding good?
 		expand_weight = 400 * 1.5 * math.sqrt(expand_count)  # likes to expand to 2, not 3
 
 		# is army good?
-		army_weight = army_value  # values army
+		army_weight = investment.army  # values army
 
-		# are workers good?
+		# are worker good?
 		supported_expands = worker_count / 16
 		if supported_expands < expand_count:
-			worker_weight = worker_value * 1.25  # we haven't saturated our expands, so build more!
+			worker_weight = investment.worker * 1.25  # we haven't saturated our expand, so build more!
 		else:
-			worker_weight = worker_value * 0.5  # devalue over producing workers
+			worker_weight = investment.worker * 0.5  # devalue over producing worker
 
 		# is more production good?
 		target_production = expand_count * 600
-		if target_production < production_value:
-			production_weight = production_value * 1.25
+		if target_production < investment.production:
+			production_weight = investment.production * 1.25
 		else:
-			production_weight = production_value * 0.5  # devalue over producing buildings
+			production_weight = investment.production * 0.5  # devalue over producing buildings
 
 		return expand_weight + army_weight + worker_weight + production_weight

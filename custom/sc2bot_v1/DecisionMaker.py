@@ -1,23 +1,39 @@
-import numpy as np
+import copy
 
-from custom.sc2bot_v1.GameAnalyst import GameAnalyst
+from custom.sc2bot_v1.Investments import Investments
 
 
 class DecisionMaker:
-	game_analyst = GameAnalyst()
+	"""
+	Decides how to invest money.
+	"""
 
-	def get_target_tuple(self, game_analyst, current_values):
-		target_values = np.zeros(4)
+	def get_target_values(self, heuristic, current_investments: Investments):
+		"""
+		What should our current investments look like? Adds some value onto our current set of investments.
+		:param heuristic: Tells us whether an investment strategy is good or not.
+		:param current_investments: Current investments. If we have 1 Barracks, production would be 150.
+		:return: What our total investments should be.
+		"""
+		target_values = Investments
 		old_score = 0
 
 		# try different investment strategies
-		for i in range(4):
-			investment_strategy = np.copy(current_values)
-			investment_strategy[i] = 400
-			score = game_analyst.get_score(investment_strategy)
+		for index in range(Investments.num_investment_options()):
+			new_strategy = self.generate_new_strategy(index, current_investments)
+			score = heuristic.get_score(new_strategy)
 
-			# pick the best investment of the resources
+			# pick the best investment option
 			if score > old_score:
-				target_values = investment_strategy
+				target_values = new_strategy
 
 		return target_values
+
+	def generate_new_strategy(self, index: int, current_investments: Investments) -> Investments:
+		"""Think of a new way of investing the extra money."""
+		investment_strategy = copy.deepcopy(current_investments)
+		additional_investment = Investments()
+
+		additional_investment._investments[index] = Investments.investment_amount()
+		investment_strategy.add(additional_investment)
+		return investment_strategy

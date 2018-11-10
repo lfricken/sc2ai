@@ -56,7 +56,7 @@ class RampWallBot(sc2.BotAI):
             # Choose any depot location
             target_depot_location = depot_placement_positions.pop()
             ws = self.workers.gathering
-            if ws: # if workers were found
+            if ws: # if worker were found
                 w = ws.random
                 await self.do(w.build(SUPPLYDEPOT, target_depot_location))
 
@@ -65,7 +65,7 @@ class RampWallBot(sc2.BotAI):
             if self.units(BARRACKS).amount + self.already_pending(BARRACKS) > 0:
                 return
             ws = self.workers.gathering
-            if ws and barracks_placement_position: # if workers were found
+            if ws and barracks_placement_position: # if worker were found
                 w = ws.random
                 await self.do(w.build(BARRACKS, barracks_placement_position))
 
