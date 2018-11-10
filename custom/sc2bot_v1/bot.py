@@ -22,8 +22,8 @@ class RampWallBot(sc2.BotAI):
 		if iteration == 0:
 			self.initialize()
 
-		if self.minerals > Investments.investment_threshold():
-			self.macro()
+		#if self.minerals > Investments.investment_threshold():
+		self.macro()
 
 		cc = self.units(Unit.COMMANDCENTER)
 		if not cc.exists:

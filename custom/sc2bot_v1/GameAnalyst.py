@@ -18,13 +18,13 @@ class GameAnalyst:
 		# are worker good?
 		supported_expands = worker_count / 16
 		if supported_expands < expand_count:
-			worker_weight = investment.worker * 1.25  # we haven't saturated our expand, so build more!
+			worker_weight = investment.worker * 1.5  # we haven't saturated our expand, so build more!
 		else:
 			worker_weight = investment.worker * 0.5  # devalue over producing worker
 
 		# is more production good?
-		target_production = expand_count * 600
-		if target_production < investment.production:
+		target_production = expand_count * 150 * 4  # we can support 4 rax per expand
+		if investment.production < target_production:
 			production_weight = investment.production * 1.25
 		else:
 			production_weight = investment.production * 0.5  # devalue over producing buildings
