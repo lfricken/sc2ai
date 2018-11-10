@@ -1,8 +1,10 @@
 import sc2reader
 
+import replay_analysis.PlayerData as PlayerData
+
 
 def replay_directory():
-	return "../replays/"
+	return "replays/"
 
 
 def test_hots_hatchfun():
@@ -17,6 +19,8 @@ game_increments = replay.real_length.seconds * 2 * 11
 
 for player in replay.players:
 
+	player_data = PlayerData.PlayerData(player)
+
 	while current_increment < game_increments:
 
 		for unit in player.units:
@@ -26,8 +30,7 @@ for player in replay.players:
 						unit_value += unit.minerals + unit.vespene
 		print(unit_value)
 		unit_value = 0
+
 		current_increment += 100
 
 	break
-
-
