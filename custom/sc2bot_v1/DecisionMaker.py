@@ -25,15 +25,14 @@ class DecisionMaker:
 
 			# pick the best investment option
 			if score > old_score:
+				old_score = score
 				target_values = new_strategy
 
 		return target_values
 
 	def generate_new_strategy(self, index: int, current_investments: Investments) -> Investments:
 		"""Think of a new way of investing the extra money."""
-		investment_strategy = copy.deepcopy(current_investments)
 		additional_investment = Investments()
-
 		additional_investment._investments[index] = Investments.investment_amount()
-		investment_strategy.add(additional_investment)
-		return investment_strategy
+
+		return current_investments.plus(additional_investment)

@@ -17,6 +17,7 @@ class ValueCalculator:
 		self.bot = bot
 
 	def get_current_investments(self) -> Investments:
+		"""TODO: do we need to take into account pending buildings? Probably."""
 		"""Returns current investments."""
 		current_investments = Investments()
 		current_investments.army = self.calc_army()
@@ -53,7 +54,10 @@ class ValueCalculator:
 		return count
 
 	def calc_expands(self) -> int:
-		"""TODO: this should actually maybe use the api to get expand count?"""
+		"""
+		TODO: should this use the api to get expand count?
+		https://github.com/Dentosal/python-sc2/wiki/The-BotAI-class
+		"""
 		count = 0
 
 		count += self.calc_unit_sum(Unit.COMMANDCENTER)
@@ -65,7 +69,7 @@ class ValueCalculator:
 	def calc_unit_sum(self, thing) -> int:
 		"""Get the total current resource investment in this unit type."""
 		count = 0
-		for _ in self.bot.units(thing).ready:
+		for _ in self.bot.units(thing):
 			count += self.get_cost_sum(thing)
 		return count
 

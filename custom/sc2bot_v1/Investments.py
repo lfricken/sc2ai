@@ -27,11 +27,21 @@ class Investments:
 	_investments = None
 
 	def __init__(self):
-		self._investments = np.zeros(Investments.num_investment_options())
+		self._investments = np.full((Investments.num_investment_options()), 1)
 
-	def add(self, other):
+	def plus(self, other: "Investments") -> "Investments":
 		"""Add another investment to this one."""
-		self._investments = np.add(self._investments, other._investments)
+		new_value = Investments()
+		new_value._investments = np.add(self._investments, other._investments)
+
+		return new_value
+
+	def minus(self, other: "Investments") -> "Investments":
+		"""Add another investment to this one."""
+		new_value = Investments()
+		new_value._investments = np.subtract(self._investments, other._investments)
+
+		return new_value
 
 	@property
 	def army(self):
