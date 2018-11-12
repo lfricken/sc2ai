@@ -4,7 +4,7 @@ from sc2.constants import UnitTypeId as Unit
 from sc2.constants import UpgradeId as Upgrade
 from sc2.game_data import *
 
-from custom.sc2bot_v1.Investments import Investments
+from custom.sc2bot_v2.Investments import Investments
 
 
 class ValueCalculator:
@@ -20,6 +20,7 @@ class ValueCalculator:
 		"""TODO: do we need to take into account pending buildings? Probably."""
 		"""Returns current investments."""
 		current_investments = Investments()
+		current_investments = current_investments.minus(current_investments)
 		current_investments.army = self.calc_army()
 		current_investments.production = self.calc_production()
 		current_investments.expand = self.calc_expands()

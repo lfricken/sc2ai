@@ -1,15 +1,12 @@
-from custom.sc2bot_v1.Investments import Investments
+from custom.sc2bot_v2.Investments import Investments
 
 
 class GameAnalyst:
 
 	def get_score(self, investment: Investments) -> int:
-		worker_count = investment.worker / 50
-		expand_count = investment.expand / 400
+		economy_calculation = min(investment.worker / 2.5, investment.expand)
 
-		economy_calculation = min(investment.worker / 2, investment.expand)
-
-		military_calculation = min(investment.army / 1, min(investment.production, economy_calculation))
+		military_calculation = min(investment.army / 1, investment.production / 1)
 
 		return min(economy_calculation, military_calculation)
 

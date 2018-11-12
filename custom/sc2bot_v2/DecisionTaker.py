@@ -3,7 +3,7 @@ from sc2.constants import UnitTypeId as UnitType
 from sc2.position import Point2
 from sc2.unit import Unit
 
-from custom.sc2bot_v1.Investments import Investments
+from custom.sc2bot_v2.Investments import Investments
 
 
 class DecisionTaker:
@@ -20,6 +20,7 @@ class DecisionTaker:
 		self.bot = bot
 
 	async def do_action(self, target_investments: Investments, current_investments: Investments) -> None:
+		"""TODO: this should actually remember the investments its made per loop so as to not overdo it"""
 
 		invest_more_in = target_investments.minus(current_investments)
 
@@ -38,17 +39,16 @@ class DecisionTaker:
 			await self.bot.expand_now()
 
 		if invest_more_in.worker > 0:
-			for _ in self.bot.units(UnitType.COMMANDCENTER):
+			for _ in self.bot.units(UnitType.COMMANDCENTER).ready:
 				town_hall: Unit = _
-				if town_hall.assigned_harvesters < town_hall.ideal_harvesters \
-					and self.bot.can_afford(UnitType.SCV) \
-					and town_hall.noqueue:
+				if self.bot.can_afford(UnitType.SCV) and town_hall.noqueue:
 					await self.bot.do(town_hall.train(UnitType.SCV))
 
 	async def try_make_another(self, unit_type: UnitType):
 		if not self.bot.can_afford(unit_type):
 			return
 		if self.bot.already_pending(unit_type):
+			# TODO: how do we handle this?
 			return
 		if self.bot.already_pending(unit_type) > 0:
 			return

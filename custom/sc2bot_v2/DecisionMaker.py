@@ -1,6 +1,4 @@
-import copy
-
-from custom.sc2bot_v1.Investments import Investments
+from custom.sc2bot_v2.Investments import Investments
 
 
 class DecisionMaker:
@@ -15,8 +13,8 @@ class DecisionMaker:
 		:param current_investments: Current investments. If we have 1 Barracks, production would be 150.
 		:return: What our total investments should be.
 		"""
-		target_values = Investments
-		old_score = 0
+		target_values = Investments()
+		old_score = -1
 
 		# try different investment strategies
 		for index in range(Investments.num_investment_options()):

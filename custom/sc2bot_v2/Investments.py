@@ -27,7 +27,7 @@ class Investments:
 	_investments = None
 
 	def __init__(self):
-		self._investments = np.full((Investments.num_investment_options()), 1)
+		self._investments = np.full((Investments.num_investment_options()), 0)
 
 	def plus(self, other: "Investments") -> "Investments":
 		"""Add another investment to this one."""
@@ -43,38 +43,43 @@ class Investments:
 
 		return new_value
 
-	@property
-	def army(self):
-		"""Resources in military units."""
-		return self._investments[0]
+	def is_less_than_or_equal_to(self, other: "Investments") -> bool:
+		temp = other.minus(self)
+		return (temp._investments >= 0).all()
 
-	@army.setter
-	def army(self, value):
-		self._investments[0] = value
-
-	@property
-	def worker(self):
-		"""Resources in worker units."""
-		return self._investments[1]
-
-	@worker.setter
-	def worker(self, value):
-		self._investments[1] = value
-
-	@property
-	def expand(self):
-		"""Resources in town centers."""
-		return self._investments[2]
-
-	@expand.setter
-	def expand(self, value):
-		self._investments[2] = value
 
 	@property
 	def production(self):
 		"""Resources in production potential."""
-		return self._investments[3]
+		return self._investments[0]
 
 	@production.setter
 	def production(self, value):
+		self._investments[0] = value
+
+	@property
+	def expand(self):
+		"""Resources in town centers."""
+		return self._investments[1]
+
+	@expand.setter
+	def expand(self, value):
+		self._investments[1] = value
+
+	@property
+	def worker(self):
+		"""Resources in worker units."""
+		return self._investments[2]
+
+	@worker.setter
+	def worker(self, value):
+		self._investments[2] = value
+
+	@property
+	def army(self):
+		"""Resources in military units."""
+		return self._investments[3]
+
+	@army.setter
+	def army(self, value):
 		self._investments[3] = value
