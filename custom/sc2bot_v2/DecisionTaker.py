@@ -3,7 +3,7 @@ from sc2.constants import UnitTypeId as UnitType
 from sc2.position import Point2
 from sc2.unit import Unit
 
-from custom.sc2bot_v2.Investments import Investments
+from Investments import Investments
 
 
 class DecisionTaker:

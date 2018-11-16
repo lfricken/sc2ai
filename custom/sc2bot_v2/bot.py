@@ -6,12 +6,12 @@ from sc2.game_data import *
 from sc2.player import Bot, Computer
 from sc2.unit import Unit
 
-from custom.sc2bot_v2.DecisionMaker import DecisionMaker
-from custom.sc2bot_v2.DecisionTaker import DecisionTaker
-from custom.sc2bot_v2.GameAnalyst import GameAnalyst
-from custom.sc2bot_v2.Investments import Investments
-from custom.sc2bot_v2.Tactician import Tactician
-from custom.sc2bot_v2.ValueCalculator import ValueCalculator
+from DecisionMaker import DecisionMaker
+from DecisionTaker import DecisionTaker
+from GameAnalyst import GameAnalyst
+from Investments import Investments
+from Tactician import Tactician
+from ValueCalculator import ValueCalculator
 
 
 class BotV2(sc2.BotAI):

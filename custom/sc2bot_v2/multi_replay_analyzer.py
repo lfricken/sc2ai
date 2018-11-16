@@ -6,7 +6,7 @@
 import sc2reader
 from sc2reader.resources import Replay
 
-from replay_analysis.PlayerData import PlayerData
+from PlayerData import PlayerData
 
 
 def process_replay(full_file_path):

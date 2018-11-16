@@ -1,6 +1,6 @@
 from sc2reader.data import Unit
 
-from custom.sc2bot_v2.Investments import Investments
+from Investments import Investments
 
 
 def unit_exists(unit: Unit, frame: int) -> bool:
@@ -83,70 +83,52 @@ def is_existing_worker(unit: Unit, current_frame):
 	return unit.is_worker and unit_exists(unit, current_frame)
 
 
+def is_existing_expand(unit: Unit, current_frame):
+	return unit.is_army and unit_exists(unit, current_frame)
+
+
+def is_existing_production(unit: Unit, current_frame):
+	return unit.is_worker and unit_exists(unit, current_frame)
+
+
+def unit_value(unit: Unit):
+	return unit.minerals + unit.vespene
+
+
 class PlayerData:
 	"""
 	Contains data about this player over the course of the game.
 	Used for a neural network to train on successful investment strategies.
 	"""
 
-	expand_value = [Investments]
-	"""How much money in expands do we have at a given time."""
-
+	value_over_time = [Investments]
+	"""How much value at a given time."""
 	total_frames: int = 0
+	"""How many frames were in the whole game."""
 
 	def __init__(self, player, total_frames: int):
-		self.army_value = [int]
 		self.total_frames = total_frames
-		self.set_army_values(player, )
+		self.set_value_array(player)
 
-	def set_value_array(self, player, evaluator, array):
-		self.army_value = [int]
+	def set_value_array(self, player):
+		self.value_over_time = [Investments]
 		increment = 0
 		current_frame = 0
+
 		while current_frame < self.total_frames:
-			for _ in player.units:
-				unit: Unit = _
-				if is_existing_army(unit, current_frame):
-					total_frame_value += unit.minerals + unit.vespene
-				if is_existing_worker(unit, current_frame):
-					total_frame_value += unit.minerals + unit.vespene
-			self.army_value.append(total_frame_value)
+			self.value_over_time.append(Investments())
+			self.process_units(player.units, current_frame)
 
 			increment += 1
 			current_frame = get_time_delta(increment)
 
-	def set_army_values(self, player):
-		self.army_value = [int]
-		current_frame = 0
-		while current_frame < self.total_frames:
-			total_frame_value = 0
-			for _ in player.units:
-				unit: Unit = _
-				if unit.is_army and unit_exists(unit, current_frame):
-					total_frame_value += unit.minerals + unit.vespene
-			self.army_value.append(total_frame_value)
-			current_frame += get_time_delta()
-
-	def set_army_values(self, player):
-		self.army_value = [int]
-		current_frame = 0
-		while current_frame < self.total_frames:
-			total_frame_value = 0
-			for _ in player.units:
-				unit: Unit = _
-				if unit.is_army and unit_exists(unit, current_frame):
-					total_frame_value += unit.minerals + unit.vespene
-			self.army_value.append(total_frame_value)
-			current_frame += get_time_delta()
-
-	def set_worker_values(self, player):
-		self.army_value = [int]
-		current_frame = 0
-		while current_frame < self.total_frames:
-			total_frame_value = 0
-			for _ in player.units:
-				unit: Unit = _
-				if unit.is_worker and unit_exists(unit, current_frame):
-					total_frame_value += unit.minerals + unit.vespene
-			self.worker_value.append(total_frame_value)
-			current_frame += get_time_delta()
+	def process_units(self, units: [Unit], current_frame: int):
+		for unit in units:
+			if is_existing_army(unit, current_frame):
+				self.value_over_time[-1].army += unit_value(unit)
+			if is_existing_worker(unit, current_frame):
+				self.value_over_time[-1].worker += unit_value(unit)
+			if is_existing_expand(unit, current_frame):
+				self.value_over_time[-1].expand += unit_value(unit)
+			if is_existing_production(unit, current_frame):
+				self.value_over_time[-1].production += unit_value(unit)

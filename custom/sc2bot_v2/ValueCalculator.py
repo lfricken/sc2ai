@@ -4,7 +4,7 @@ from sc2.constants import UnitTypeId as Unit
 from sc2.constants import UpgradeId as Upgrade
 from sc2.game_data import *
 
-from custom.sc2bot_v2.Investments import Investments
+from Investments import Investments
 
 
 class ValueCalculator:

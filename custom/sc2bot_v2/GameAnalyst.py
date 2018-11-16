@@ -1,4 +1,4 @@
-from custom.sc2bot_v2.Investments import Investments
+from Investments import Investments
 
 
 class GameAnalyst:
