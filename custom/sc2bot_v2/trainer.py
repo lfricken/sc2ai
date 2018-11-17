@@ -73,10 +73,10 @@ for _ in FileEnumerable.get_analysis_enumerable():
 					correct_inputs = training_data.inputs
 					correct_outputs = training_data.outputs
 
-					summary, c = sess.run(fetches=[trainer, cost],
+					summary, cost_value, output = sess.run(fetches=[trainer, cost, network],
 					                      feed_dict={networkInput: correct_inputs, networkOutput: correct_outputs})
 
-					avg_cost += c / total_batches
+					avg_cost += cost_value / total_batches
 				print("Epoch: {}".format(epoch + 1) + " Cost = {:.5f}".format(avg_cost))
 			print("Done Training.")
 		saver.save(sess, "brains/")
