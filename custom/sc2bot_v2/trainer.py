@@ -1,0 +1,7 @@
+# trains a neural network
+
+
+
+
+
+
