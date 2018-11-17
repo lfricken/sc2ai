@@ -6,6 +6,12 @@ __pycache__/
 # avoid pycharm project
 *.idea
 *.pkl
+
+
+output/
+brains/
+
+
 *.SC2Replay
 
 # C extensions

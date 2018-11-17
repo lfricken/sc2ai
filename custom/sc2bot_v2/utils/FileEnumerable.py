@@ -1,6 +1,6 @@
 import os
 import pickle
-from typing import Generator
+from typing import Iterator
 
 from utils.Directories import Directories
 from utils.ProgressBar import *
@@ -11,7 +11,7 @@ class FileEnumerable:
 	"""Loops over directories easier."""
 
 	@staticmethod
-	def get_analysis_enumerable() -> Generator[TrainingData]:
+	def get_analysis_enumerable() -> Iterator[TrainingData]:
 		"""Loops over analysis data and returns each TrainingData."""
 
 		num_files = 0
@@ -35,8 +35,9 @@ class FileEnumerable:
 		print("Done!")
 
 	@staticmethod
-	def get_replays_dirs_enumerable() -> Generator[(str, str)]:
-		"""Loops over replay files and the expected output analysis."""
+	def get_replays_dirs_enumerable() -> (str, str):
+		"""
+		Loops over replay files and the expected output analysis."""
 
 		num_replays = 0
 		for filename in os.listdir(Directories.replays()):
