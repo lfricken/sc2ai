@@ -1,6 +1,6 @@
 import numpy as np
 
-from PlayerData import PlayerData
+from utils.PlayerData import PlayerData
 
 
 class TrainingData:

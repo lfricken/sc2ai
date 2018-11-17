@@ -1,4 +1,4 @@
-from Investments import Investments
+from utils.Investments import Investments
 
 
 class DecisionMaker:

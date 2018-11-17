@@ -9,7 +9,7 @@ from sc2.unit import Unit
 from DecisionMaker import DecisionMaker
 from DecisionTaker import DecisionTaker
 from GameAnalyst import GameAnalyst
-from Investments import Investments
+from utils.Investments import Investments
 from Tactician import Tactician
 from ValueCalculator import ValueCalculator
 
