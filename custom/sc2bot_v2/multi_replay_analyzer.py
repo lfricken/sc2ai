@@ -3,16 +3,15 @@
 # 2. analyze every replay in it
 # 3. write the data to a file
 
-import os
 import pickle
 
 import sc2reader
 from sc2reader.resources import Replay
 
+from utils.Directories import *
 from utils.PlayerData import PlayerData
+from utils.ProgressBar import *
 from utils.TrainingData import TrainingData
-
-directory = "C:\\dev\\ai\\sc2\\sc2ai\\replays"
 
 
 def process_replay(full_file_path) -> TrainingData:
@@ -23,9 +22,22 @@ def process_replay(full_file_path) -> TrainingData:
 	return TrainingData(player_1_data, player_2_data)
 
 
-for filename in os.listdir(directory):
+num_replays = 0
+for filename in os.listdir(Directories.replays()):
 	if filename.endswith(".SC2Replay"):
-		training_session = process_replay(os.path.join(directory, filename))
-		output_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "analysis")
-		with open(os.path.join(output_dir, filename + ".pkl"), "wb") as outfile:
+		num_replays += 1
+
+print("%s files in directory" % num_replays)
+start_progress("Analyzing Replays")
+
+num_files_processed = 0
+for filename in os.listdir(Directories.replays()):
+	if filename.endswith(".SC2Replay"):
+		training_session = process_replay(os.path.join(Directories.replays(), filename))
+		with open(os.path.join(Directories.analysis(), filename + ".pkl"), "wb") as outfile:
 			pickle.dump(training_session, outfile, pickle.HIGHEST_PROTOCOL)
+			num_files_processed += 1
+			progress(num_files_processed / num_replays)
+
+end_progress()
+print("Done!")

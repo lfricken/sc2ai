@@ -23,7 +23,11 @@ def unit_started_during(unit: Unit, start_frame: int, end_frame: int) -> bool:
 def is_expand(unit: Unit) -> bool:
 	if unit.title == "CommandCenter":
 		return True
+	if unit.title == "CommandCenterFlying":
+		return True
 	if unit.title == "OrbitalCommand":
+		return True
+	if unit.title == "OrbitalCommandFlying":
 		return True
 	if unit.title == "PlanetaryFortress":
 		return True

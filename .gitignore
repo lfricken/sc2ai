@@ -5,6 +5,8 @@ __pycache__/
 
 # avoid pycharm project
 *.idea
+*.pkl
+*.SC2Replay
 
 # C extensions
 *.so

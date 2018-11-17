@@ -6,10 +6,12 @@ from utils.PlayerData import PlayerData
 class TrainingData:
 	""""""
 
-	inputs: [np.array] = []
-	outputs: [np.array] = []
+	inputs: [np.array] = None
+	outputs: [np.array] = None
 
 	def __init__(self, player_1: PlayerData, player_2: PlayerData):
+		self.inputs = []
+		self.outputs = []
 		did_player_2_win = player_2.won_the_game
 
 		for increment in range(len(player_1.value_over_time)):

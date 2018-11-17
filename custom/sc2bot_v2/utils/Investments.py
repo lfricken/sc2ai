@@ -24,7 +24,7 @@ class Investments:
 		"""Amount of money we should we consider investing each time."""
 		return 400
 
-	investments = None
+	investments: np.ndarray = None
 
 	def __init__(self):
 		self.investments = np.full((Investments.num_investment_options()), 0)
@@ -48,7 +48,7 @@ class Investments:
 		return (temp.investments >= 0).all()
 
 	@property
-	def army(self):
+	def army(self) -> int:
 		"""Resources in military units."""
 		return self.investments[0]
 
@@ -57,7 +57,7 @@ class Investments:
 		self.investments[0] = value
 
 	@property
-	def production(self):
+	def production(self) -> int:
 		"""Resources in production potential."""
 		return self.investments[1]
 
@@ -66,7 +66,7 @@ class Investments:
 		self.investments[1] = value
 
 	@property
-	def worker(self):
+	def worker(self) -> int:
 		"""Resources in worker units."""
 		return self.investments[2]
 
@@ -75,7 +75,7 @@ class Investments:
 		self.investments[2] = value
 
 	@property
-	def expand(self):
+	def expand(self) -> int:
 		"""Resources in town centers."""
 		return self.investments[3]
 
