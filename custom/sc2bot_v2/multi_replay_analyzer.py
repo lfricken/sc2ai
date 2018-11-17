@@ -3,20 +3,27 @@
 # 2. analyze every replay in it
 # 3. write the data to a file
 
+import os
+import pickle
+
 import sc2reader
 from sc2reader.resources import Replay
 
 from PlayerData import PlayerData
+from TrainingData import TrainingData
 
 
-def process_replay(full_file_path):
+def process_replay(full_file_path) -> TrainingData:
 	replay: Replay = sc2reader.load_replay(full_file_path, load_level=4)
-	data = PlayerData(replay.players[0], replay.frames)
-	print("done")
+	player_1_data = PlayerData(replay.players[0], replay.frames)
+	player_2_data = PlayerData(replay.players[1], replay.frames)
+
+	return TrainingData(player_1_data, player_2_data)
 
 
-process_replay("replays/Example.SC2Replay")
-
-# directory = "C:\\dev\\ai\sc2\\replays"
-# for filename in os.listdir(directory):
-#	process_replay(os.path.join(directory, filename))
+directory = "C:\\dev\\ai\\sc2\\sc2ai\\replays"
+for filename in os.listdir(directory):
+	if filename.endswith(".SC2Replay"):
+		training_session = process_replay(os.path.join(directory, filename))
+		with open(os.path.join(directory, filename + ".pkl"), "wb") as outfile:
+			pickle.dump(training_session, outfile, pickle.HIGHEST_PROTOCOL)

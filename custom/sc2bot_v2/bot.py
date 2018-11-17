@@ -70,7 +70,7 @@ class BotV2(sc2.BotAI):
 			else:
 				await self.do(depot(Ability.MORPH_SUPPLYDEPOT_LOWER))
 
-		# Lower depos when no enemies are nearby
+		# Lower depots when no enemies are nearby
 		for depot in self.units(UnitType.SUPPLYDEPOTLOWERED).ready:
 			for unit in self.known_enemy_units.not_structure:
 				if unit.position.to2.distance_to(depot.position.to2) < 10:

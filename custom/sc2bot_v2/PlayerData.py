@@ -20,7 +20,7 @@ def unit_started_during(unit: Unit, start_frame: int, end_frame: int) -> bool:
 		return False
 
 
-def is_town_hall(unit: Unit) -> bool:
+def is_expand(unit: Unit) -> bool:
 	if unit.title == "CommandCenter":
 		return True
 	if unit.title == "OrbitalCommand":
@@ -39,7 +39,7 @@ def is_town_hall(unit: Unit) -> bool:
 		return True
 
 
-def is_production_building(unit: Unit) -> bool:
+def is_production(unit: Unit) -> bool:
 	if unit.title == "Barracks":
 		return True
 	if unit.title == "Factory":
@@ -84,11 +84,11 @@ def is_existing_worker(unit: Unit, current_frame):
 
 
 def is_existing_expand(unit: Unit, current_frame):
-	return unit.is_army and unit_exists(unit, current_frame)
+	return is_expand(unit) and unit_exists(unit, current_frame)
 
 
 def is_existing_production(unit: Unit, current_frame):
-	return unit.is_worker and unit_exists(unit, current_frame)
+	return is_production(unit) and unit_exists(unit, current_frame)
 
 
 def unit_value(unit: Unit):
@@ -101,6 +101,8 @@ class PlayerData:
 	Used for a neural network to train on successful investment strategies.
 	"""
 
+	won_the_game: bool
+	"""True if this player won the game."""
 	value_over_time = [Investments]
 	"""How much value at a given time."""
 	total_frames: int = 0
@@ -109,9 +111,10 @@ class PlayerData:
 	def __init__(self, player, total_frames: int):
 		self.total_frames = total_frames
 		self.set_value_array(player)
+		self.won_the_game = (player.result == "Win")
 
 	def set_value_array(self, player):
-		self.value_over_time = [Investments]
+		self.value_over_time: [Investments] = list()
 		increment = 0
 		current_frame = 0
 
@@ -129,6 +132,6 @@ class PlayerData:
 			if is_existing_worker(unit, current_frame):
 				self.value_over_time[-1].worker += unit_value(unit)
 			if is_existing_expand(unit, current_frame):
-				self.value_over_time[-1].expand += unit_value(unit)
+				self.value_over_time[-1].expand += 400  # unit_value(unit)
 			if is_existing_production(unit, current_frame):
 				self.value_over_time[-1].production += unit_value(unit)

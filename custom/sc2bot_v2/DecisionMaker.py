@@ -31,6 +31,6 @@ class DecisionMaker:
 	def generate_new_strategy(self, index: int, current_investments: Investments) -> Investments:
 		"""Think of a new way of investing the extra money."""
 		additional_investment = Investments()
-		additional_investment._investments[index] = Investments.investment_amount()
+		additional_investment.investments[index] = Investments.investment_amount()
 
 		return current_investments.plus(additional_investment)
