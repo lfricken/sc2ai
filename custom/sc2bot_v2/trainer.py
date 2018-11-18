@@ -14,11 +14,12 @@ from utils.TrainingData import TrainingData
 
 # Parameters
 learning_rate = 0.2
-training_epochs = 15
+training_epochs = 100
 
 num_inputs = Investments.num_investment_options() * 2
 num_hidden_1 = 30
 num_labels = 2  # win loss
+save_directory = "brains/sc2bot_v2_brain.ckpt"
 
 
 # Create model
@@ -29,6 +30,7 @@ def add_middle_layer(existing_network):
 
 def add_output_layer(existing_network):
 	out = tf.layers.dense(inputs=existing_network, units=num_labels, activation=tf.nn.sigmoid)
+	out = tf.nn.softmax(logits=out)
 	return out
 
 
@@ -64,7 +66,7 @@ network = add_middle_layer(networkInput)
 network = add_output_layer(network)
 
 # Define loss and optimizer
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=networkOutput))
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=networkOutput))
 trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
 
 saver = tf.train.Saver()
@@ -72,17 +74,25 @@ with tf.Session() as sess:
 	sess.run(tf.global_variables_initializer())
 	# writer = tf.summary.FileWriter("output", sess.graph)  # write the graph?
 
-	# always load first
 	try:
-		saver.restore(sess, "brains/")
-		print("\nLoading brain.")
-	except Exception:
-		print("\nCreating new brain.")
+		saver.restore(sess, save_directory)
+		print("Brain loaded.")  # We loaded a network!
+	except ValueError:
+		print("No brain found. Creating new brain.")  # There was nothing to load.
 
-	# start training
+	# Test model
+	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
+	compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
+	accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+	correct_inputs = training_data_array[0].inputs
+	correct_outputs = training_data_array[0].outputs
+	accuracy = accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs})
+	print("Accuracy before: {:.2f}%".format(accuracy * 100))
+
+	print("Training.")
 	for epoch in range(training_epochs):
 		total_batches = 5
-		avg_cost = 0.
+		# avg_cost = 0.
 
 		for training_data in training_data_array:
 
@@ -98,21 +108,20 @@ with tf.Session() as sess:
 				                                       feed_dict={networkInput: correct_inputs,
 				                                                  networkOutput: correct_outputs})
 
-				avg_cost += cost_value / total_batches
+	# avg_cost += cost_value / total_batches
 
-		print("Epoch: {}".format(epoch + 1) + " Cost = {:.5f}".format(avg_cost))
+	# print("Epoch: {}".format(epoch + 1) + " Cost = {:.5f}".format(avg_cost))
 
-		# Test model
-		# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
+	print("Saving.")
+	saver.save(sess, save_directory)
 
-		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
-		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+	# Test model
+	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
+	compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
+	accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+	correct_inputs = training_data_array[0].inputs
+	correct_outputs = training_data_array[0].outputs
+	accuracy = accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs})
+	print("Accuracy after: {:.2f}%".format(accuracy * 100))
 
-		correct_inputs = training_data_array[0].inputs
-		correct_outputs = training_data_array[0].outputs
-		print("Accuracy:", accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
-		# writer.close()
-
-	print("Done Training.")
-	saver.save(sess, "brains/")
-
+# writer.close()
