@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+from typing import Iterator
+
 import numpy as np
 import tensorflow as tf
 
@@ -13,15 +15,15 @@ from utils.TrainingData import TrainingData
 # Parameters
 learning_rate = 0.2
 training_epochs = 15
-batch_size = 100
 
-num_labels = 1  # win loss odds
 num_inputs = Investments.num_investment_options() * 2
+num_hidden_1 = 30
+num_labels = 2  # win loss
 
 
 # Create model
 def add_middle_layer(existing_network):
-	out = tf.layers.dense(inputs=existing_network, units=30, activation=tf.nn.sigmoid)
+	out = tf.layers.dense(inputs=existing_network, units=num_hidden_1, activation=tf.nn.sigmoid)
 	return out
 
 
@@ -35,59 +37,82 @@ def add_softmax_layer(existing_network):
 	return out
 
 
-for _ in FileEnumerable.get_analysis_enumerable():
-	training_data: TrainingData = _
-	# tf Graph input
-	networkInput = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
-	networkOutput = tf.placeholder(shape=[None, num_labels], dtype=tf.float32)
+def get_training_enumerable() -> Iterator[TrainingData]:
+	for data in FileEnumerable.get_analysis_enumerable():
+		training_data: TrainingData = data
 
-	# randomly flip data
-	for i in range(len(training_data.inputs)):
-		if np.random.randint(0, 2) == 1:
-			training_data.inputs[i] = np.roll(training_data.inputs[i], Investments.num_investment_options())
-			training_data.outputs[i][0] = not training_data.outputs[i][0]  # flip who won
+		# randomize the data so the network just doesn't predict the winning player
+		for increment in range(len(training_data.inputs)):
+			if np.random.randint(0, 2) == 0:  # 50 50
+				training_data.inputs[increment] = np.roll(training_data.inputs[increment], int(num_inputs / 2))
+				training_data.outputs[increment] = np.roll(training_data.outputs[increment],
+				                                           int(num_labels / 2))  # flip who won
 
-	# Construct model
-	network = add_middle_layer(networkInput)
-	network = add_output_layer(network)
+		yield training_data
 
-	# Define loss and optimizer
-	cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=networkOutput))
-	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
 
-	saver = tf.train.Saver()
-	with tf.Session() as sess:
-		sess.run(tf.global_variables_initializer())
-		writer = tf.summary.FileWriter("output", sess.graph)
+training_data_array: [TrainingData] = []
+for data in get_training_enumerable():
+	training_data_array.append(data)
 
-		if (False):
-			saver.restore(sess, "brains/")
-		else:
-			for epoch in range(training_epochs):
-				total_batches = 5
+# tf Graph input
+networkInput = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
+networkOutput = tf.placeholder(shape=[None, num_labels], dtype=tf.float32)
 
-				avg_cost = 0.
-				j = 0
-				for i in range(total_batches):
-					j += 1
-					correct_inputs = training_data.inputs
-					correct_outputs = training_data.outputs
+# Construct model
+network = add_middle_layer(networkInput)
+network = add_output_layer(network)
 
-					summary, cost_value, output = sess.run(fetches=[trainer, cost, network],
-					                      feed_dict={networkInput: correct_inputs, networkOutput: correct_outputs})
+# Define loss and optimizer
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=networkOutput))
+trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
 
-					avg_cost += cost_value / total_batches
-				print("Epoch: {}".format(epoch + 1) + " Cost = {:.5f}".format(avg_cost))
-			print("Done Training.")
-		saver.save(sess, "brains/")
+saver = tf.train.Saver()
+with tf.Session() as sess:
+	sess.run(tf.global_variables_initializer())
+	# writer = tf.summary.FileWriter("output", sess.graph)  # write the graph?
+
+	# always load first
+	try:
+		saver.restore(sess, "brains/")
+		print("\nLoading brain.")
+	except Exception:
+		print("\nCreating new brain.")
+
+	# start training
+	for epoch in range(training_epochs):
+		total_batches = 5
+		avg_cost = 0.
+
+		for training_data in training_data_array:
+
+			for batch in range(total_batches):
+				correct_inputs = training_data.inputs
+				correct_outputs = training_data.outputs
+
+				# fetches determines what to "compute"
+				# passing the network implies you want to compute the values that the network produces
+				# passing trainer implies you want to compute, and therefor influence, the values of the network
+				# passing a computation for cost lets you return the value computed by the cost algorithm
+				summary, cost_value, output = sess.run(fetches=[trainer, cost, network],
+				                                       feed_dict={networkInput: correct_inputs,
+				                                                  networkOutput: correct_outputs})
+
+				avg_cost += cost_value / total_batches
+
+		print("Epoch: {}".format(epoch + 1) + " Cost = {:.5f}".format(avg_cost))
 
 		# Test model
-		correct_prediction = tf.equal(tf.argmax(network, 1), tf.argmax(networkOutput, 1))
+		# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
 
-		accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
+		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
 
-		correct_inputs = training_data.inputs
-		correct_outputs = training_data.outputs
+		correct_inputs = training_data_array[0].inputs
+		correct_outputs = training_data_array[0].outputs
 		print("Accuracy:", accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
+		# writer.close()
 
-		writer.close()
+	print("Done Training.")
+	saver.save(sess, "brains/")
+
