@@ -3,7 +3,6 @@
 
 from __future__ import print_function
 
-import sys
 from typing import Iterator
 
 import numpy as np
@@ -15,13 +14,13 @@ from utils.TrainingData import DataPoint
 from utils.TrainingData import TrainingData
 
 # Parameters
-learning_rate = 0.2
-training_epochs = 100
+learning_rate = 2
+training_epochs = 20
 num_test_samples = 30
 
 num_inputs = Investments.num_investment_options() * 2
-num_hidden_1 = 5
-num_labels = 2  # win loss
+num_hidden_1 = 30
+num_outputs = 2  # win loss
 
 save_directory = "brains/sc2bot_v2_brain.ckpt"
 
@@ -33,7 +32,7 @@ def add_middle_layer(existing_network):
 
 
 def add_output_layer(existing_network):
-	out = tf.layers.dense(inputs=existing_network, units=num_labels, activation=tf.nn.sigmoid)
+	out = tf.layers.dense(inputs=existing_network, units=num_outputs, activation=tf.nn.sigmoid)
 	return out
 
 
@@ -47,24 +46,42 @@ def get_training_enumerable() -> Iterator[TrainingData]:
 		yield _
 
 
-training_data_array: [DataPoint] = []
-for data in FileEnumerable.get_analysis_enumerable():
-	training_data_array = np.append(training_data_array, data.data_points)
+def randomize_data(data_array: [DataPoint]):
+	for i in range(len(data_array)):
+		if np.random.randint(0, 2) == 1:  # flip which player slot won
+			data_array[i].inputs = np.roll(data_array[i].inputs, int(num_inputs / 2))
+			data_array[i].outputs = np.roll(data_array[i].outputs, int(num_outputs / 2))
 
-input_array: [[int]] = []
-output_array: [[int]] = []
-for _ in training_data_array:
-	data: DataPoint = _
-	input_array.append(data.inputs)
-	output_array.append(data.outputs)
+	np.random.shuffle(data_array)
+
+
+def generate_data() -> ([[int]], [[int]]):
+	training_data_array: [DataPoint] = []
+	for _ in FileEnumerable.get_analysis_enumerable():
+		data: TrainingData = _
+		training_data_array = np.append(training_data_array, data.data_points)
+
+	randomize_data(training_data_array)
+
+	_input_array: [[int]] = []
+	_output_array: [[int]] = []
+	for _ in training_data_array:
+		data: DataPoint = _
+		_input_array.append(data.inputs)
+		_output_array.append(data.outputs)
+
+	return _input_array, _output_array
+
+
+(input_array, output_array) = generate_data()
 
 # tf Graph input
 networkInput = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
-networkOutput = tf.placeholder(shape=[None, num_labels], dtype=tf.float32)
+networkOutput = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
 # Construct model
 network = add_middle_layer(networkInput)
-network = add_output_layer(network)
+network = add_softmax_layer(add_output_layer(network))
 
 # Define loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=networkOutput))
@@ -83,20 +100,18 @@ with tf.Session() as sess:
 
 	# Test model
 	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
-	#tests = np.empty(1)
-	#for sample in range(num_test_samples):
-	compute_correct_prediction = tf.equal(tf.argmax(network, 1), tf.argmax(networkOutput, 1))
-	accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-	correct_inputs = input_array
-	correct_outputs = output_array
-	acc = accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs})
-	#	tests = np.append(tests, acc)
-	print("Accuracy before: {:.2f}%".format(acc * 100))
+	tests = []
+	for sample in range(num_test_samples):
+		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
+		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+		correct_inputs = input_array
+		correct_outputs = output_array
+		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
+	print("Accuracy before: {:.2f}%".format(np.mean(tests) * 100))
 
 	print("Training.")
 	for epoch in range(training_epochs):
-		total_batches = 1
-		# avg_cost = 0.
+		total_batches = 4
 
 		for batch in range(total_batches):
 			correct_inputs = input_array
@@ -110,22 +125,27 @@ with tf.Session() as sess:
 			                                       feed_dict={networkInput: correct_inputs,
 			                                                  networkOutput: correct_outputs})
 
-	# avg_cost += cost_value / total_batches
-
-	# print("Epoch: {}".format(epoch + 1) + " Cost = {:.5f}".format(avg_cost))
+		tests = []
+		for sample in range(num_test_samples):
+			compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
+			accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+			correct_inputs = input_array
+			correct_outputs = output_array
+			tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
+		print("Epoch {} accuracy: {:.2f}%".format(epoch + 1, np.mean(tests) * 100))
 
 	print("Saving.")
 	saver.save(sess, save_directory)
 
 	# Test model
 	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
-	tests = np.empty(1)
+	tests = []
 	for sample in range(num_test_samples):
 		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
 		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
 		correct_inputs = input_array
 		correct_outputs = output_array
-		tests = np.append(tests, accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
-	print("Accuracy after: {:.2f}%".format(tests.mean() * 100))
+		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
+	print("Accuracy after: {:.2f}%".format(np.mean(tests) * 100))
 
 # writer.close()
