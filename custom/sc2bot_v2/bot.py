@@ -1,3 +1,5 @@
+import os
+
 import sc2
 from sc2 import Difficulty
 from sc2.constants import AbilityId as Ability
@@ -9,9 +11,11 @@ from sc2.unit import Unit
 from DecisionMaker import DecisionMaker
 from DecisionTaker import DecisionTaker
 from GameAnalyst import GameAnalyst
-from utils.Investments import Investments
 from Tactician import Tactician
 from ValueCalculator import ValueCalculator
+from utils.Directories import Directories
+from utils.FileEnumerable import FileEnumerable
+from utils.Investments import Investments
 
 
 class BotV2(sc2.BotAI):
@@ -117,11 +121,23 @@ class BotV2(sc2.BotAI):
 		await self.tactician.update()
 
 
+def reserve_replay_name() -> str:
+	extension = ".SC2Replay"
+	num_files = FileEnumerable.get_file_count(Directories.generated_replays(), extension)
+	replay_name = "sc2bot_v2_replay_{}{}".format(num_files, extension)
+	full_replay_name = os.path.join(Directories.generated_replays(), replay_name)
+	file = open(full_replay_name, "w+")
+	file.close()
+	return full_replay_name
+
+
 def main():
+	full_replay_name = reserve_replay_name()
+
 	sc2.run_game(sc2.maps.get("OdysseyLE"), [
 		Bot(Race.Terran, BotV2()),
-		Computer(Race.Zerg, Difficulty.Easy)
-	], realtime=False)
+		Computer(Race.Terran, Difficulty.VeryHard)
+	], realtime=False, save_replay_as=full_replay_name)
 
 
 if __name__ == '__main__':

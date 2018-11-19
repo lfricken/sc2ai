@@ -11,18 +11,23 @@ class FileEnumerable:
 	"""Loops over directories easier."""
 
 	@staticmethod
+	def get_file_count(directory: str, extension: str) -> int:
+		num_files = 0
+		for (path, filename) in FileEnumerable.get_files_enumerable(directory):
+			if filename.endswith(extension):
+				num_files += 1
+		return num_files
+
+	@staticmethod
 	def get_analysis_enumerable() -> Iterator[TrainingData]:
 		"""Loops over analysis data and returns each TrainingData."""
+		extension = ".pkl"
+		file_count = FileEnumerable.get_file_count(Directories.analysis(), extension)
 
-		num_files = 0
-		for filename in os.listdir(Directories.analysis()):
-			if filename.endswith(".pkl"):
-				num_files += 1
-
-		print("%s files in directory" % num_files)
+		print("{} {} files in directory".format(file_count, file_count))
 
 		for filename in os.listdir(Directories.analysis()):
-			if filename.endswith(".pkl"):
+			if filename.endswith(extension):
 				with open(os.path.join(Directories.analysis(), filename), "rb") as infile:
 					analysis_data: TrainingData = pickle.load(infile)
 					yield analysis_data
@@ -32,29 +37,28 @@ class FileEnumerable:
 		"""
 		Loops over replay files and the expected output analysis."""
 
-		num_replays = 0
-		for (path, filename) in FileEnumerable.get_replays_enumerable(Directories.replays()):
-			if filename.endswith(".SC2Replay"):
-				num_replays += 1
+		extension = ".SC2Replay"
+		file_count = FileEnumerable.get_file_count(Directories.analysis(), extension)
 
-		print("%s files in directory" % num_replays)
+		print("{} {} files in directory".format(file_count, file_count))
+
 		start_progress("Analyzing Replays")
 		num_files_processed = 0
 
-		for (path, filename) in FileEnumerable.get_replays_enumerable(Directories.replays()):
-			if filename.endswith(".SC2Replay"):
+		for (path, filename) in FileEnumerable.get_files_enumerable(Directories.replays()):
+			if filename.endswith(extension):
 				replay_file = os.path.join(path, filename)
 				replay_analysis_file = os.path.join(Directories.analysis(), filename + ".pkl")
 				yield (replay_file, replay_analysis_file)
 				num_files_processed += 1
-				progress(num_files_processed / num_replays)
+				progress(num_files_processed / file_count)
 
 		end_progress()
 		print("Done!")
 
 	@staticmethod
-	def get_replays_enumerable(root: str) -> (str, str):
+	def get_files_enumerable(root: str) -> (str, str):
 		"""Full path and file name"""
-		for path, subdirs, files in os.walk(root):
+		for path, _, files in os.walk(root):
 			for name in files:
 				yield (path, name)
