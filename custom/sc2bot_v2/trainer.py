@@ -104,14 +104,14 @@ with tf.Session() as sess:
 	for sample in range(num_test_samples):
 		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
 		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-		correct_inputs = input_array
-		correct_outputs = output_array
+		correct_inputs = [input_array[sample]]
+		correct_outputs = [output_array[sample]]
 		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
 	print("Accuracy before: {:.2f}%".format(np.mean(tests) * 100))
 
 	print("Training.")
 	for epoch in range(training_epochs):
-		total_batches = 4
+		total_batches = 1
 
 		for batch in range(total_batches):
 			correct_inputs = input_array
@@ -129,8 +129,8 @@ with tf.Session() as sess:
 		for sample in range(num_test_samples):
 			compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
 			accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-			correct_inputs = input_array
-			correct_outputs = output_array
+			correct_inputs = [input_array[sample]]
+			correct_outputs = [output_array[sample]]
 			tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
 		print("Epoch {} accuracy: {:.2f}%".format(epoch + 1, np.mean(tests) * 100))
 
@@ -143,8 +143,8 @@ with tf.Session() as sess:
 	for sample in range(num_test_samples):
 		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
 		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-		correct_inputs = input_array
-		correct_outputs = output_array
+		correct_inputs = [input_array[sample]]
+		correct_outputs = [output_array[sample]]
 		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
 	print("Accuracy after: {:.2f}%".format(np.mean(tests) * 100))
 

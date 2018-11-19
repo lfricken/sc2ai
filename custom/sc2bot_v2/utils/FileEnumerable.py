@@ -33,7 +33,7 @@ class FileEnumerable:
 		Loops over replay files and the expected output analysis."""
 
 		num_replays = 0
-		for filename in os.listdir(Directories.replays()):
+		for (path, filename) in FileEnumerable.get_replays_enumerable(Directories.replays()):
 			if filename.endswith(".SC2Replay"):
 				num_replays += 1
 
@@ -41,9 +41,9 @@ class FileEnumerable:
 		start_progress("Analyzing Replays")
 		num_files_processed = 0
 
-		for filename in os.listdir(Directories.replays()):
+		for (path, filename) in FileEnumerable.get_replays_enumerable(Directories.replays()):
 			if filename.endswith(".SC2Replay"):
-				replay_file = os.path.join(Directories.replays(), filename)
+				replay_file = os.path.join(path, filename)
 				replay_analysis_file = os.path.join(Directories.analysis(), filename + ".pkl")
 				yield (replay_file, replay_analysis_file)
 				num_files_processed += 1
@@ -51,3 +51,10 @@ class FileEnumerable:
 
 		end_progress()
 		print("Done!")
+
+	@staticmethod
+	def get_replays_enumerable(root: str) -> (str, str):
+		"""Full path and file name"""
+		for path, subdirs, files in os.walk(root):
+			for name in files:
+				yield (path, name)
