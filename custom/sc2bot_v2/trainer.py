@@ -15,7 +15,7 @@ from utils.TrainingData import TrainingData
 
 # Parameters
 learning_rate = 10
-training_epochs = 100
+training_epochs = 10
 num_test_samples = 30
 
 num_inputs = Investments.num_investment_options() * 2
@@ -36,7 +36,7 @@ def add_output_layer(existing_network):
 	return out
 
 
-def add_softmax_layer(existing_network):
+def add_softmax_layer(existing_network) -> tf.nn.softmax:
 	out = tf.nn.softmax(existing_network)
 	return out
 
@@ -75,96 +75,66 @@ def generate_data() -> ([[int]], [[int]]):
 	return _input_array, _output_array
 
 
-(input_array, output_array) = generate_data()
+def print_manual_evaluation(network: tf.nn.softmax, input_type: tf.placeholder):
+	test_input = [[0, 0, 400, 400, 400, 400, 400, 400]]
+	# by just passing network, it implies we want the output from network
+	test_output = network.eval({input_type: test_input})
+	print("Odds players winning given {}: {} ".format(test_input, test_output))
 
-# tf Graph input
-networkInput = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
-networkOutput = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
-# Construct model
-network = add_middle_layer(networkInput)
-network = add_softmax_layer(add_output_layer(network))
-
-# Define loss and optimizer
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=networkOutput))
-trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
-
-saver = tf.train.Saver()
-with tf.Session() as sess:
-	sess.run(tf.global_variables_initializer())
-	# writer = tf.summary.FileWriter("output", sess.graph)  # write the graph?
-
-	try:
-		saver.restore(sess, save_directory)
-		print("Brain loaded.")  # We loaded a network!
-	except ValueError:
-		print("No brain found. Creating new brain.")  # There was nothing to load.
-
-	# use model
-	correct_inputs = [[0, 0, 400, 400, 400, 400, 400, 400]]
-	output = sess.run(fetches=[network], feed_dict={networkInput: correct_inputs})
-	print("Odds of winning given {}: {} ".format(correct_inputs, output))
-
+def print_accuracy(network, input_data, output_data, input_type, output_type, before_or_after: str):
 	# Test model
 	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
 	tests = []
-	for sample in range(num_test_samples):
-		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
-		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-		correct_inputs = [input_array[sample]]
-		correct_outputs = [output_array[sample]]
-		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
-	print("Accuracy before: {:.2f}%".format(np.mean(tests) * 100))
+	compute_correct_prediction = tf.equal(tf.round(network), tf.round(output_type))
+	accuracy: tf.reduce_mean = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+	tests.append(accuracy.eval({input_type: input_data, output_type: output_data}))
+	print("Accuracy {}: {:.2f}%".format(before_or_after, np.mean(tests) * 100))
 
-	print("Training.")
-	for epoch in range(training_epochs):
-		total_batches = 30
-		avg_cost = 0
 
-		for batch in range(total_batches):
-			correct_inputs = input_array
-			correct_outputs = output_array
+def run():
+	(input_data_full, output_data_full) = generate_data()
 
-			# fetches determines what to "compute"
-			# passing the network implies you want to compute the values that the network produces
-			# passing trainer implies you want to compute, and therefor influence, the values of the network
-			# passing a computation for cost lets you return the value computed by the cost algorithm
-			summary, cost_value, output = sess.run(fetches=[trainer, cost, network],
-			                                       feed_dict={networkInput: correct_inputs,
-			                                                  networkOutput: correct_outputs})
+	# tf Graph input
+	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
+	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
-			avg_cost += cost_value / total_batches
+	# Construct model
+	network = add_middle_layer(input_type)
+	network = add_softmax_layer(add_output_layer(network))
+	# Define loss and optimizer
+	cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=output_type))
+	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
 
-		print(avg_cost)
+	saver = tf.train.Saver()
+	with tf.Session() as sess:
+		sess.run(tf.global_variables_initializer())
 
-		"""
-		tests = []
-		for sample in range(num_test_samples):
-			compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
-			accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-			correct_inputs = [input_array[sample]]
-			correct_outputs = [output_array[sample]]
-			tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
-		print("Epoch {} accuracy: {:.2f}%".format(epoch + 1, np.mean(tests) * 100))
-		"""
+		# try to load the brain
+		try:
+			saver.restore(sess, save_directory)
+			print("Brain loaded.")  # We loaded a network!
+		except ValueError:
+			print("No brain found. Creating new brain.")  # There was nothing to load.
 
-	print("Saving.")
-	saver.save(sess, save_directory)
+		print_accuracy(network, input_data_full, output_data_full, input_type, output_type, "before")
+		print_manual_evaluation(network, input_type)
 
-	# Test model
-	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
-	tests = []
-	for sample in range(num_test_samples):
-		compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
-		accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-		correct_inputs = [input_array[sample]]
-		correct_outputs = [output_array[sample]]
-		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
-	print("Accuracy after: {:.2f}%".format(np.mean(tests) * 100))
+		print("Training.")
+		for epoch in range(training_epochs):
+			total_batches = 30
 
-	# use model
-	correct_inputs = [[0, 0, 400, 400, 400, 400, 400, 400]]
-	output = sess.run(fetches=[network], feed_dict={networkInput: correct_inputs})
-	print("Odds of winning given {}: {} ".format(correct_inputs, output))
+			# batches should actually not be all the data
+			for batch in range(total_batches):
+				# fetches determines what to "compute"
+				# passing trainer implies you want to compute, and therefor influence, the values of the network
+				sess.run(fetches=[trainer], feed_dict={input_type: input_data_full, output_type: output_data_full})
 
-# writer.close()
+		print("Saving.")
+		saver.save(sess, save_directory)
+
+		print_accuracy(network, input_data_full, output_data_full, input_type, output_type, "after")
+		print_manual_evaluation(network, input_type)
+
+
+run()
