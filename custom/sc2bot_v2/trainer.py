@@ -14,15 +14,15 @@ from utils.TrainingData import DataPoint
 from utils.TrainingData import TrainingData
 
 # Parameters
-learning_rate = 2
-training_epochs = 20
+learning_rate = 10
+training_epochs = 100
 num_test_samples = 30
 
 num_inputs = Investments.num_investment_options() * 2
 num_hidden_1 = 30
 num_outputs = 2  # win loss
 
-save_directory = "brains/sc2bot_v2_brain.ckpt"
+save_directory = "brains/{}_{}_{}_sc2bot_v2_brain.ckpt".format(num_inputs, num_hidden_1, num_outputs)
 
 
 # Create model
@@ -51,6 +51,8 @@ def randomize_data(data_array: [DataPoint]):
 		if np.random.randint(0, 2) == 1:  # flip which player slot won
 			data_array[i].inputs = np.roll(data_array[i].inputs, int(num_inputs / 2))
 			data_array[i].outputs = np.roll(data_array[i].outputs, int(num_outputs / 2))
+		else:
+			data_array[i].outputs = np.array(data_array[i].outputs)
 
 	np.random.shuffle(data_array)
 
@@ -98,6 +100,11 @@ with tf.Session() as sess:
 	except ValueError:
 		print("No brain found. Creating new brain.")  # There was nothing to load.
 
+	# use model
+	correct_inputs = [[0, 0, 400, 400, 400, 400, 400, 400]]
+	output = sess.run(fetches=[network], feed_dict={networkInput: correct_inputs})
+	print("Odds of winning given {}: {} ".format(correct_inputs, output))
+
 	# Test model
 	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
 	tests = []
@@ -111,7 +118,8 @@ with tf.Session() as sess:
 
 	print("Training.")
 	for epoch in range(training_epochs):
-		total_batches = 1
+		total_batches = 30
+		avg_cost = 0
 
 		for batch in range(total_batches):
 			correct_inputs = input_array
@@ -125,6 +133,11 @@ with tf.Session() as sess:
 			                                       feed_dict={networkInput: correct_inputs,
 			                                                  networkOutput: correct_outputs})
 
+			avg_cost += cost_value / total_batches
+
+		print(avg_cost)
+
+		"""
 		tests = []
 		for sample in range(num_test_samples):
 			compute_correct_prediction = tf.equal(tf.round(network), tf.round(networkOutput))
@@ -133,6 +146,7 @@ with tf.Session() as sess:
 			correct_outputs = [output_array[sample]]
 			tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
 		print("Epoch {} accuracy: {:.2f}%".format(epoch + 1, np.mean(tests) * 100))
+		"""
 
 	print("Saving.")
 	saver.save(sess, save_directory)
@@ -147,5 +161,10 @@ with tf.Session() as sess:
 		correct_outputs = [output_array[sample]]
 		tests.append(accuracy.eval({networkInput: correct_inputs, networkOutput: correct_outputs}))
 	print("Accuracy after: {:.2f}%".format(np.mean(tests) * 100))
+
+	# use model
+	correct_inputs = [[0, 0, 400, 400, 400, 400, 400, 400]]
+	output = sess.run(fetches=[network], feed_dict={networkInput: correct_inputs})
+	print("Odds of winning given {}: {} ".format(correct_inputs, output))
 
 # writer.close()
