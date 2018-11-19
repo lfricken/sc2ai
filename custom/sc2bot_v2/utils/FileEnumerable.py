@@ -24,7 +24,7 @@ class FileEnumerable:
 		extension = ".pkl"
 		file_count = FileEnumerable.get_file_count(Directories.analysis(), extension)
 
-		print("{} {} files in directory".format(file_count, file_count))
+		print("{} {} files in directory".format(file_count, extension))
 
 		for filename in os.listdir(Directories.analysis()):
 			if filename.endswith(extension):
@@ -38,9 +38,9 @@ class FileEnumerable:
 		Loops over replay files and the expected output analysis."""
 
 		extension = ".SC2Replay"
-		file_count = FileEnumerable.get_file_count(Directories.analysis(), extension)
+		file_count = FileEnumerable.get_file_count(Directories.replays(), extension)
 
-		print("{} {} files in directory".format(file_count, file_count))
+		print("{} {} files in directory".format(file_count, extension))
 
 		start_progress("Analyzing Replays")
 		num_files_processed = 0

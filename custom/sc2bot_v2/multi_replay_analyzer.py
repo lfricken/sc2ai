@@ -7,23 +7,32 @@ import pickle
 
 import sc2reader
 from sc2reader.resources import Replay
-from utils.FileEnumerable import FileEnumerable
 
+from utils.FileEnumerable import FileEnumerable
 from utils.PlayerData import PlayerData
 from utils.TrainingData import TrainingData
 
 
-def process_replay(full_file_path) -> TrainingData:
+def process_replay(full_file_path):
 	"""Turns the replay into analyzed data."""
 
 	replay: Replay = sc2reader.load_replay(full_file_path, load_level=4)
-	player_1_data = PlayerData(replay.players[0], replay.frames)
-	player_2_data = PlayerData(replay.players[1], replay.frames)
 
-	return TrainingData(player_1_data, player_2_data)
+	p1 = replay.players[0]
+	p2 = replay.players[1]
+	t_won = (p1.play_race == "Terran" and p1.result == "Win") or (p2.play_race == "Terran" and p2.result == "Win")
+	p_won = (p1.play_race == "Protoss" and p1.result == "Win") or (p2.play_race == "Protoss" and p2.result == "Win")
+
+	if t_won or p_won:
+		player_1_data = PlayerData(replay.players[0], replay.frames)
+		player_2_data = PlayerData(replay.players[1], replay.frames)
+		return TrainingData(player_1_data, player_2_data)
+	else:
+		return None
 
 
 for (replay_file, replay_analysis_file) in FileEnumerable.get_replays_dirs_enumerable():
 	training_data = process_replay(replay_file)
-	with open(replay_analysis_file, "wb") as outfile:
-		pickle.dump(training_data, outfile, pickle.HIGHEST_PROTOCOL)
+	if training_data is not None:
+		with open(replay_analysis_file, "wb") as outfile:
+			pickle.dump(training_data, outfile, pickle.HIGHEST_PROTOCOL)

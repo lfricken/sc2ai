@@ -66,11 +66,21 @@ def is_production(unit: Unit) -> bool:
 	if unit.title == "Stargate":
 		return True
 
-	if unit.title == "Hatchery":
+	if unit.title == "SpawningPool":
 		return True
-	if unit.title == "Lair":
+	if unit.title == "RoachWarren":
 		return True
-	if unit.title == "Hive":
+	if unit.title == "BanelingNest":
+		return True
+	if unit.title == "HydraliskDen":
+		return True
+	if unit.title == "Spire":
+		return True
+	if unit.title == "InfestationPit":
+		return True
+	if unit.title == "UltraliskCavern":
+		return True
+	if unit.title == "GreaterSpire":
 		return True
 
 
@@ -80,7 +90,10 @@ def get_time_delta(increment: int) -> int:
 
 
 def is_existing_army(unit: Unit, current_frame):
-	return unit.is_army and unit_exists(unit, current_frame)
+	if unit.name == "Overlord" or unit.name == "OverseerCocoon" or unit.name == "Overseer":
+		return False
+	else:
+		return unit.is_army and unit_exists(unit, current_frame)
 
 
 def is_existing_worker(unit: Unit, current_frame):
