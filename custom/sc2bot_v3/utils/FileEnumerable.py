@@ -33,7 +33,7 @@ class FileEnumerable:
 					yield analysis_data
 
 	@staticmethod
-	def get_replays_dirs_enumerable() -> (str, str):
+	def get_replays_dirs_enumerable(show_progress: bool = True) -> (str, str):
 		"""
 		Loops over replay files and the expected output analysis."""
 
@@ -42,7 +42,8 @@ class FileEnumerable:
 
 		print("{} {} files in directory".format(file_count, extension))
 
-		start_progress("Analyzing Replays")
+		if show_progress:
+			start_progress("Analyzing Replays")
 		num_files_processed = 0
 
 		for (path, filename) in FileEnumerable.get_files_enumerable(Directories.replays()):
@@ -51,10 +52,12 @@ class FileEnumerable:
 				replay_analysis_file = os.path.join(Directories.analysis(), filename + ".pkl")
 				yield (replay_file, replay_analysis_file)
 				num_files_processed += 1
-				progress(num_files_processed / file_count)
+				if show_progress:
+					progress(num_files_processed / file_count)
 
-		end_progress()
-		print("Done!")
+		if show_progress:
+			end_progress()
+			print("Done!")
 
 	@staticmethod
 	def get_files_enumerable(root: str) -> (str, str):

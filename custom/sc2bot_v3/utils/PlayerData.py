@@ -1,6 +1,6 @@
 from sc2reader.data import Unit
 
-from utils.Investments import Investments
+from utils.Investments import *
 
 
 def unit_exists(unit: Unit, frame: int) -> bool:
@@ -118,17 +118,17 @@ class PlayerData:
 	Used for a neural network to train on successful investment strategies.
 	"""
 
+	value_over_time = [Investments]
+
 	won_the_game: bool
 	"""True if this player won the game."""
-	value_over_time = [Investments]
-	"""How much value at a given time."""
 	total_frames: int = 0
 	"""How many frames were in the whole game."""
 
-	def __init__(self, player, total_frames: int):
-		self.total_frames = total_frames
-		self.set_value_array(player)
-		self.won_the_game = (player.result == "Win")
+	def __init__(self, vals):
+		self.total_frames = vals.total_frames
+		self.won_the_game = (vals.player.result == "Win")
+		self.set_value_array(vals.player)
 
 	def set_value_array(self, player):
 		self.value_over_time: [Investments] = list()
@@ -136,14 +136,21 @@ class PlayerData:
 		current_frame = 0
 
 		while current_frame < self.total_frames:
-			self.value_over_time.append(Investments())
+			self.value_over_time.append(self.get_race_investment())
 			self.process_units(player.units, current_frame)
 
 			increment += 1
 			current_frame = get_time_delta(increment)
 
+	def get_race_investment(self):
+		return
+
 	def process_units(self, units: [Unit], current_frame: int):
-		for unit in units:
+		for _ in units:
+			unit: Unit = _
+			if not unit.is_army and not unit.is_worker and not unit.is_building:
+				continue
+
 			if is_existing_army(unit, current_frame):
 				self.value_over_time[-1].army += unit_value(unit)
 			if is_existing_worker(unit, current_frame):
@@ -152,3 +159,35 @@ class PlayerData:
 				self.value_over_time[-1].expand += 400  # unit_value(unit)
 			if is_existing_production(unit, current_frame):
 				self.value_over_time[-1].production += unit_value(unit)
+
+			# TODO: add to the unit counts
+
+
+class TerranData(PlayerData):
+	value_over_time = [TerranInvestments]
+
+	def __init__(self, vals):
+		super(TerranData, self).__init__(vals)
+
+	def get_race_investment(self) -> Investments:
+		return TerranInvestments()
+
+
+class ZergData(PlayerData):
+	value_over_time = [ZergInvestments]
+
+	def __init__(self, vals):
+		super(ZergData, self).__init__(vals)
+
+	def get_race_investment(self) -> Investments:
+		return ZergInvestments()
+
+
+class ProtossData(PlayerData):
+	value_over_time = [ProtossInvestments]
+
+	def __init__(self, vals):
+		super(ProtossData, self).__init__(vals)
+
+	def get_race_investment(self) -> Investments:
+		return ProtossInvestments()

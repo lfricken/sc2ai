@@ -1,18 +1,31 @@
 import numpy as np
 
 
+def in_exceptions(name: str) -> bool:
+	name = name.upper()
+	exceptions = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED",
+	              "CREEPTUMORQUEEN"]
+	if any(bad in name for bad in exceptions):
+		return True
+	return False
+
+
+def fix_name(name: str) -> str:
+	name = name.upper()
+	# first replace
+	if name == "CREEPTUMORQUEEN":
+		return "CREEPTUMOR"
+
+	remove = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED"]
+	for sub_str in remove:
+		if sub_str in name:
+			return name.replace(sub_str, "")
+
+
 class Investments:
 	"""
 	How many resources, and invested in what?
 	"""
-
-	@staticmethod
-	def num_investment_options():
-		"""
-		How many investment variables do we consider?
-		A.K.A. length of new_investment_array.
-		"""
-		return 4
 
 	@staticmethod
 	def investment_threshold():
@@ -27,7 +40,7 @@ class Investments:
 	investments: np.ndarray = None
 
 	def __init__(self):
-		self.investments = np.full((Investments.num_investment_options()), 0)
+		self.investments = np.full(4, 0)
 
 	def plus(self, other: "Investments") -> "Investments":
 		"""Add another investment to this one."""
@@ -46,6 +59,11 @@ class Investments:
 	def is_less_than_or_equal_to(self, other: "Investments") -> bool:
 		temp = other.minus(self)
 		return (temp.investments >= 0).all()
+
+	@property
+	def size(self) -> int:
+		"""How big is our investment array."""
+		return len(self.investments[0])
 
 	@property
 	def army(self) -> int:
@@ -82,3 +100,572 @@ class Investments:
 	@expand.setter
 	def expand(self, value):
 		self.investments[3] = value
+
+
+class ZergInvestments(Investments):
+
+	def __init__(self):
+		self.investments = np.full(38, 0)
+
+	@property
+	def HATCHERY(self) -> int:
+		return self.investments[4]
+
+	@HATCHERY.setter
+	def HATCHERY(self, value):
+		self.investments[4] = value
+
+	@property
+	def LAIR(self) -> int:
+		return self.investments[5]
+
+	@LAIR.setter
+	def LAIR(self, value):
+		self.investments[5] = value
+
+	@property
+	def DRONE(self) -> int:
+		return self.investments[6]
+
+	@DRONE.setter
+	def DRONE(self, value):
+		self.investments[6] = value
+
+	@property
+	def OVERLORD(self) -> int:
+		return self.investments[7]
+
+	@OVERLORD.setter
+	def OVERLORD(self, value):
+		self.investments[7] = value
+
+	@property
+	def EXTRACTOR(self) -> int:
+		return self.investments[8]
+
+	@EXTRACTOR.setter
+	def EXTRACTOR(self, value):
+		self.investments[8] = value
+
+	@property
+	def SPAWNINGPOOL(self) -> int:
+		return self.investments[9]
+
+	@SPAWNINGPOOL.setter
+	def SPAWNINGPOOL(self, value):
+		self.investments[9] = value
+
+	@property
+	def ZERGLING(self) -> int:
+		return self.investments[10]
+
+	@ZERGLING.setter
+	def ZERGLING(self, value):
+		self.investments[10] = value
+
+	@property
+	def QUEEN(self) -> int:
+		return self.investments[11]
+
+	@QUEEN.setter
+	def QUEEN(self, value):
+		self.investments[11] = value
+
+	@property
+	def CREEPTUMOR(self) -> int:
+		return self.investments[12]
+
+	@CREEPTUMOR.setter
+	def CREEPTUMOR(self, value):
+		self.investments[12] = value
+
+	@property
+	def ROACHWARREN(self) -> int:
+		return self.investments[13]
+
+	@ROACHWARREN.setter
+	def ROACHWARREN(self, value):
+		self.investments[13] = value
+
+	@property
+	def SPORECRAWLER(self) -> int:
+		return self.investments[14]
+
+	@SPORECRAWLER.setter
+	def SPORECRAWLER(self, value):
+		self.investments[14] = value
+
+	@property
+	def ROACH(self) -> int:
+		return self.investments[15]
+
+	@ROACH.setter
+	def ROACH(self, value):
+		self.investments[15] = value
+
+	@property
+	def RAVAGER(self) -> int:
+		return self.investments[16]
+
+	@RAVAGER.setter
+	def RAVAGER(self, value):
+		self.investments[16] = value
+
+	@property
+	def OVERSEER(self) -> int:
+		return self.investments[17]
+
+	@OVERSEER.setter
+	def OVERSEER(self, value):
+		self.investments[17] = value
+
+	@property
+	def EVOLUTIONCHAMBER(self) -> int:
+		return self.investments[18]
+
+	@EVOLUTIONCHAMBER.setter
+	def EVOLUTIONCHAMBER(self, value):
+		self.investments[18] = value
+
+	@property
+	def INFESTATIONPIT(self) -> int:
+		return self.investments[19]
+
+	@INFESTATIONPIT.setter
+	def INFESTATIONPIT(self, value):
+		self.investments[19] = value
+
+	@property
+	def SWARMHOST(self) -> int:
+		return self.investments[20]
+
+	@SWARMHOST.setter
+	def SWARMHOST(self, value):
+		self.investments[20] = value
+
+	@property
+	def LOCUST(self) -> int:
+		return self.investments[21]
+
+	@LOCUST.setter
+	def LOCUST(self, value):
+		self.investments[21] = value
+
+	@property
+	def BANELINGNEST(self) -> int:
+		return self.investments[22]
+
+	@BANELINGNEST.setter
+	def BANELINGNEST(self, value):
+		self.investments[22] = value
+
+	@property
+	def BROODLING(self) -> int:
+		return self.investments[23]
+
+	@BROODLING.setter
+	def BROODLING(self, value):
+		self.investments[23] = value
+
+	@property
+	def BANELING(self) -> int:
+		return self.investments[24]
+
+	@BANELING.setter
+	def BANELING(self, value):
+		self.investments[24] = value
+
+	@property
+	def HYDRALISKDEN(self) -> int:
+		return self.investments[25]
+
+	@HYDRALISKDEN.setter
+	def HYDRALISKDEN(self, value):
+		self.investments[25] = value
+
+	@property
+	def HYDRALISK(self) -> int:
+		return self.investments[26]
+
+	@HYDRALISK.setter
+	def HYDRALISK(self, value):
+		self.investments[26] = value
+
+	@property
+	def SPIRE(self) -> int:
+		return self.investments[27]
+
+	@SPIRE.setter
+	def SPIRE(self, value):
+		self.investments[27] = value
+
+	@property
+	def MUTALISK(self) -> int:
+		return self.investments[28]
+
+	@MUTALISK.setter
+	def MUTALISK(self, value):
+		self.investments[28] = value
+
+	@property
+	def HIVE(self) -> int:
+		return self.investments[29]
+
+	@HIVE.setter
+	def HIVE(self, value):
+		self.investments[29] = value
+
+	@property
+	def ULTRALISKCAVERN(self) -> int:
+		return self.investments[30]
+
+	@ULTRALISKCAVERN.setter
+	def ULTRALISKCAVERN(self, value):
+		self.investments[30] = value
+
+	@property
+	def VIPER(self) -> int:
+		return self.investments[31]
+
+	@VIPER.setter
+	def VIPER(self, value):
+		self.investments[31] = value
+
+	@property
+	def GREATERSPIRE(self) -> int:
+		return self.investments[32]
+
+	@GREATERSPIRE.setter
+	def GREATERSPIRE(self, value):
+		self.investments[32] = value
+
+	@property
+	def ULTRALISK(self) -> int:
+		return self.investments[33]
+
+	@ULTRALISK.setter
+	def ULTRALISK(self, value):
+		self.investments[33] = value
+
+	@property
+	def CORRUPTOR(self) -> int:
+		return self.investments[34]
+
+	@CORRUPTOR.setter
+	def CORRUPTOR(self, value):
+		self.investments[34] = value
+
+	@property
+	def BROODLORD(self) -> int:
+		return self.investments[35]
+
+	@BROODLORD.setter
+	def BROODLORD(self, value):
+		self.investments[35] = value
+
+	@property
+	def SPINECRAWLER(self) -> int:
+		return self.investments[36]
+
+	@SPINECRAWLER.setter
+	def SPINECRAWLER(self, value):
+		self.investments[36] = value
+
+	@property
+	def INFESTOR(self) -> int:
+		return self.investments[37]
+
+	@INFESTOR.setter
+	def INFESTOR(self, value):
+		self.investments[37] = value
+
+
+class TerranInvestments(Investments):
+
+	def __init__(self):
+		self.investments = np.full(39, 0)
+
+	@property
+	def COMMANDCENTER(self) -> int:
+		return self.investments[4]
+
+	@COMMANDCENTER.setter
+	def COMMANDCENTER(self, value):
+		self.investments[4] = value
+
+	@property
+	def ORBITALCOMMAND(self) -> int:
+		return self.investments[5]
+
+	@ORBITALCOMMAND.setter
+	def ORBITALCOMMAND(self, value):
+		self.investments[5] = value
+
+	@property
+	def SCV(self) -> int:
+		return self.investments[6]
+
+	@SCV.setter
+	def SCV(self, value):
+		self.investments[6] = value
+
+	@property
+	def SUPPLYDEPOT(self) -> int:
+		return self.investments[7]
+
+	@SUPPLYDEPOT.setter
+	def SUPPLYDEPOT(self, value):
+		self.investments[7] = value
+
+	@property
+	def BARRACKS(self) -> int:
+		return self.investments[8]
+
+	@BARRACKS.setter
+	def BARRACKS(self, value):
+		self.investments[8] = value
+
+	@property
+	def REFINERY(self) -> int:
+		return self.investments[9]
+
+	@REFINERY.setter
+	def REFINERY(self, value):
+		self.investments[9] = value
+
+	@property
+	def MULE(self) -> int:
+		return self.investments[10]
+
+	@MULE.setter
+	def MULE(self, value):
+		self.investments[10] = value
+
+	@property
+	def REAPER(self) -> int:
+		return self.investments[11]
+
+	@REAPER.setter
+	def REAPER(self, value):
+		self.investments[11] = value
+
+	@property
+	def FACTORY(self) -> int:
+		return self.investments[12]
+
+	@FACTORY.setter
+	def FACTORY(self, value):
+		self.investments[12] = value
+
+	@property
+	def MARINE(self) -> int:
+		return self.investments[13]
+
+	@MARINE.setter
+	def MARINE(self, value):
+		self.investments[13] = value
+
+	@property
+	def BARRACKSREACTOR(self) -> int:
+		return self.investments[14]
+
+	@BARRACKSREACTOR.setter
+	def BARRACKSREACTOR(self, value):
+		self.investments[14] = value
+
+	@property
+	def REACTOR(self) -> int:
+		return self.investments[15]
+
+	@REACTOR.setter
+	def REACTOR(self, value):
+		self.investments[15] = value
+
+	@property
+	def FACTORYREACTOR(self) -> int:
+		return self.investments[16]
+
+	@FACTORYREACTOR.setter
+	def FACTORYREACTOR(self, value):
+		self.investments[16] = value
+
+	@property
+	def STARPORT(self) -> int:
+		return self.investments[17]
+
+	@STARPORT.setter
+	def STARPORT(self, value):
+		self.investments[17] = value
+
+	@property
+	def BARRACKSTECHLAB(self) -> int:
+		return self.investments[18]
+
+	@BARRACKSTECHLAB.setter
+	def BARRACKSTECHLAB(self, value):
+		self.investments[18] = value
+
+	@property
+	def TECHLAB(self) -> int:
+		return self.investments[19]
+
+	@TECHLAB.setter
+	def TECHLAB(self, value):
+		self.investments[19] = value
+
+	@property
+	def STARPORTTECHLAB(self) -> int:
+		return self.investments[20]
+
+	@STARPORTTECHLAB.setter
+	def STARPORTTECHLAB(self, value):
+		self.investments[20] = value
+
+	@property
+	def FACTORYTECHLAB(self) -> int:
+		return self.investments[21]
+
+	@FACTORYTECHLAB.setter
+	def FACTORYTECHLAB(self, value):
+		self.investments[21] = value
+
+	@property
+	def HELLION(self) -> int:
+		return self.investments[22]
+
+	@HELLION.setter
+	def HELLION(self, value):
+		self.investments[22] = value
+
+	@property
+	def BANSHEE(self) -> int:
+		return self.investments[23]
+
+	@BANSHEE.setter
+	def BANSHEE(self, value):
+		self.investments[23] = value
+
+	@property
+	def ARMORY(self) -> int:
+		return self.investments[24]
+
+	@ARMORY.setter
+	def ARMORY(self, value):
+		self.investments[24] = value
+
+	@property
+	def ENGINEERINGBAY(self) -> int:
+		return self.investments[25]
+
+	@ENGINEERINGBAY.setter
+	def ENGINEERINGBAY(self, value):
+		self.investments[25] = value
+
+	@property
+	def CYCLONE(self) -> int:
+		return self.investments[26]
+
+	@CYCLONE.setter
+	def CYCLONE(self, value):
+		self.investments[26] = value
+
+	@property
+	def RAVEN(self) -> int:
+		return self.investments[27]
+
+	@RAVEN.setter
+	def RAVEN(self, value):
+		self.investments[27] = value
+
+	@property
+	def STARPORTREACTOR(self) -> int:
+		return self.investments[28]
+
+	@STARPORTREACTOR.setter
+	def STARPORTREACTOR(self, value):
+		self.investments[28] = value
+
+	@property
+	def SIEGETANK(self) -> int:
+		return self.investments[29]
+
+	@SIEGETANK.setter
+	def SIEGETANK(self, value):
+		self.investments[29] = value
+
+	@property
+	def MISSILETURRET(self) -> int:
+		return self.investments[30]
+
+	@MISSILETURRET.setter
+	def MISSILETURRET(self, value):
+		self.investments[30] = value
+
+	@property
+	def MEDIVAC(self) -> int:
+		return self.investments[31]
+
+	@MEDIVAC.setter
+	def MEDIVAC(self, value):
+		self.investments[31] = value
+
+	@property
+	def VIKING(self) -> int:
+		return self.investments[32]
+
+	@VIKING.setter
+	def VIKING(self, value):
+		self.investments[32] = value
+
+	@property
+	def THOR(self) -> int:
+		return self.investments[33]
+
+	@THOR.setter
+	def THOR(self, value):
+		self.investments[33] = value
+
+	@property
+	def PLANETARYFORTRESS(self) -> int:
+		return self.investments[34]
+
+	@PLANETARYFORTRESS.setter
+	def PLANETARYFORTRESS(self, value):
+		self.investments[34] = value
+
+	@property
+	def SENSORTOWER(self) -> int:
+		return self.investments[35]
+
+	@SENSORTOWER.setter
+	def SENSORTOWER(self, value):
+		self.investments[35] = value
+
+	@property
+	def MARAUDER(self) -> int:
+		return self.investments[36]
+
+	@MARAUDER.setter
+	def MARAUDER(self, value):
+		self.investments[36] = value
+
+	@property
+	def WIDOWMINE(self) -> int:
+		return self.investments[37]
+
+	@WIDOWMINE.setter
+	def WIDOWMINE(self, value):
+		self.investments[37] = value
+
+	@property
+	def BUNKER(self) -> int:
+		return self.investments[38]
+
+	@BUNKER.setter
+	def BUNKER(self, value):
+		self.investments[38] = value
+
+
+class ProtossInvestments(Investments):
+	def hi(self):
+		return
