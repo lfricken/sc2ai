@@ -16,10 +16,15 @@ def fix_name(name: str) -> str:
 	if name == "CREEPTUMORQUEEN":
 		return "CREEPTUMOR"
 
+	if name == "LOCUSTMPFLYING":
+		return "LOCUST"
+
 	remove = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED"]
 	for sub_str in remove:
 		if sub_str in name:
 			return name.replace(sub_str, "")
+
+	return name
 
 
 class Investments:

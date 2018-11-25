@@ -84,32 +84,37 @@ def is_production(unit: Unit) -> bool:
 		return True
 
 
-def get_time_delta(increment: int) -> int:
+def get_time_delta() -> int:
 	"""Use 5 second increments."""
-	return 112 * increment  # 22.4 frames per second * 5seconds
+	return 112  # 22.4 frames per second * 5seconds
 
 
-def is_existing_army(unit: Unit, current_frame):
+def get_time_sample(increment: int) -> int:
+	"""Use 5 second increments."""
+	return get_time_delta() * increment
+
+
+def is_army(unit: Unit):
 	if unit.name == "Overlord" or unit.name == "OverseerCocoon" or unit.name == "Overseer":
 		return False
 	else:
-		return unit.is_army and unit_exists(unit, current_frame)
+		return unit.is_army
 
 
-def is_existing_worker(unit: Unit, current_frame):
-	return unit.is_worker and unit_exists(unit, current_frame)
-
-
-def is_existing_expand(unit: Unit, current_frame):
-	return is_expand(unit) and unit_exists(unit, current_frame)
-
-
-def is_existing_production(unit: Unit, current_frame):
-	return is_production(unit) and unit_exists(unit, current_frame)
+def is_worker(unit: Unit):
+	return unit.is_worker
 
 
 def unit_value(unit: Unit):
 	return unit.minerals + unit.vespene
+
+
+def get_unit_name(unit: Unit, current_frame: int) -> str:
+	name: str = ""
+	for start, data in unit.type_history.items():
+		if start <= current_frame:
+			name = data.name
+	return name
 
 
 class PlayerData:
@@ -140,7 +145,7 @@ class PlayerData:
 			self.process_units(player.units, current_frame)
 
 			increment += 1
-			current_frame = get_time_delta(increment)
+			current_frame = get_time_sample(increment)
 
 	def get_race_investment(self):
 		return
@@ -151,16 +156,21 @@ class PlayerData:
 			if not unit.is_army and not unit.is_worker and not unit.is_building:
 				continue
 
-			if is_existing_army(unit, current_frame):
-				self.value_over_time[-1].army += unit_value(unit)
-			if is_existing_worker(unit, current_frame):
-				self.value_over_time[-1].worker += unit_value(unit)
-			if is_existing_expand(unit, current_frame):
-				self.value_over_time[-1].expand += 400  # unit_value(unit)
-			if is_existing_production(unit, current_frame):
-				self.value_over_time[-1].production += unit_value(unit)
+			if unit_exists(unit, current_frame):
+				tick_investments: Investments = self.value_over_time[-1]
+				if is_army(unit):
+					tick_investments.army += unit_value(unit)
+				if is_worker(unit):
+					tick_investments.worker += unit_value(unit)
+				if is_expand(unit):
+					tick_investments.expand += 400  # unit_value(unit)
+				if is_production(unit):
+					tick_investments.production += unit_value(unit)
 
-			# TODO: add to the unit counts
+				unit_name = get_unit_name(unit, current_frame).upper()
+				unit_type: str = fix_name(unit_name)
+				unit_type_count: int = getattr(tick_investments, unit_type) + 1
+				setattr(tick_investments, unit_type, unit_type_count)
 
 
 class TerranData(PlayerData):
