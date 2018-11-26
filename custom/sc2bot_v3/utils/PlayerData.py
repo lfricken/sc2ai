@@ -124,6 +124,9 @@ class PlayerData:
 	"""
 
 	value_over_time = [Investments]
+	"""We have money in these things during that time."""
+	value_deltas = [Investments]
+	"""We spent money on this during that time."""
 
 	won_the_game: bool
 	"""True if this player won the game."""
@@ -150,6 +153,9 @@ class PlayerData:
 		for _ in player.units:
 			unit: Unit = _
 
+			if unit is None or unit.name is None:
+				continue
+
 			if ignore(unit.name):
 				continue
 
@@ -167,7 +173,7 @@ class PlayerData:
 				tick_investments.production += unit_value(unit)
 
 			# process this unit over time
-			increment = 0
+			increment: int = 0
 			current_frame = 0
 			while current_frame < self.total_frames:
 				current_frame = get_time_sample(increment)
@@ -177,7 +183,12 @@ class PlayerData:
 					target_investments = target_investments.plus(tick_investments)
 
 					unit_type: str = fix_name(get_unit_name(unit, current_frame).upper())
-					setattr(target_investments, unit_type, getattr(target_investments, unit_type) + 1)
+					if unit_type != "" and hasattr(target_investments, unit_type):
+						setattr(target_investments, unit_type, getattr(target_investments, unit_type) + 1)
+					else:
+						break
+
+					self.value_over_time[increment] = target_investments
 
 				increment += 1
 
