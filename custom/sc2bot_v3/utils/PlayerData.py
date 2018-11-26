@@ -195,26 +195,6 @@ class PlayerData:
 	def get_race_investment(self):
 		ValueError("You called get_race_investment on the base class!")
 
-	def process_units(self, unit: Unit, current_frame: int):
-		if not unit.is_army and not unit.is_worker and not unit.is_building:
-			return
-
-		if unit_exists(unit, current_frame):
-			tick_investments: Investments = self.value_over_time[-1]
-			if is_army(unit):
-				tick_investments.army += unit_value(unit)
-			if is_worker(unit):
-				tick_investments.worker += unit_value(unit)
-			if is_expand(unit):
-				tick_investments.expand += 400  # unit_value(unit)
-			if is_production(unit):
-				tick_investments.production += unit_value(unit)
-
-			unit_name = get_unit_name(unit, current_frame).upper()
-			unit_type: str = fix_name(unit_name)
-			unit_type_count: int = getattr(tick_investments, unit_type) + 1
-			setattr(tick_investments, unit_type, unit_type_count)
-
 
 class TerranData(PlayerData):
 	value_over_time = [TerranInvestments]
