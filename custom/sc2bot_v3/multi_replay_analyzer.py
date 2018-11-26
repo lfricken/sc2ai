@@ -50,19 +50,19 @@ def process_replay(replay: Replay) -> TrainingData:
 
 for (replay_file, replay_analysis_file) in FileEnumerable.get_replays_dirs_enumerable():
 
-	start = time.time()
+	#start = time.time()
 	loaded_replay: Replay = sc2reader.load_replay(replay_file, load_level=3)
-	end = time.time()
-	print("Reading took " + str(end - start))
+	#end = time.time()
+	#print("Reading took " + str(end - start))
 
-	start = time.time()
+	#start = time.time()
 	training_data = process_replay(loaded_replay)
-	end = time.time()
-	print("Analyzing took " + str(end - start))
+	#end = time.time()
+	#print("Analyzing took " + str(end - start))
 
-	start = time.time()
+	#start = time.time()
 	if training_data is not None:
 		with open(replay_analysis_file, "wb") as outfile:
 			pickle.dump(training_data, outfile, pickle.HIGHEST_PROTOCOL)
-	end = time.time()
-	print("Saving took " + str(end - start))
+	#end = time.time()
+	#print("Saving took " + str(end - start))
