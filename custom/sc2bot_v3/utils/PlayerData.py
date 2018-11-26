@@ -136,11 +136,10 @@ class PlayerData:
 	def __init__(self, vals):
 		self.total_frames = vals.total_frames
 		self.won_the_game = (vals.player.result == "Win")
-		self.set_value_array(vals.player)
+		self.set_value_array(vals.player.units)
 
 	def build_array(self):
 		self.value_over_time: [Investments] = list()
-
 		increment = 0
 		current_frame = 0
 		while current_frame < self.total_frames:
@@ -148,9 +147,17 @@ class PlayerData:
 			self.value_over_time.append(self.get_race_investment())
 			increment += 1
 
-	def set_value_array(self, player):
+		self.value_deltas: [Investments] = list()
+		increment = 0
+		current_frame = 0
+		while current_frame < self.total_frames:
+			current_frame = get_time_sample(increment)
+			self.value_deltas.append(self.get_race_investment())
+			increment += 1
+
+	def set_value_array(self, units: [Unit]):
 		self.build_array()
-		for _ in player.units:
+		for _ in units:
 			unit: Unit = _
 
 			if unit is None or unit.name is None:
@@ -161,6 +168,12 @@ class PlayerData:
 
 			if not unit.is_army and not unit.is_worker and not unit.is_building:
 				continue
+
+			for start, values in unit.type_history.items():
+				start_increment: int = start // get_time_delta()
+				# ignore what we start with
+				if start != 0:
+					self.add_unit_count(self.value_deltas[start_increment], unit, start)
 
 			tick_investments: Investments = self.get_race_investment()
 			if is_army(unit):
@@ -173,7 +186,7 @@ class PlayerData:
 				tick_investments.production += unit_value(unit)
 
 			# process this unit over time
-			increment: int = 0
+			increment: int = int(0)
 			current_frame = 0
 			while current_frame < self.total_frames:
 				current_frame = get_time_sample(increment)
@@ -182,15 +195,20 @@ class PlayerData:
 					target_investments: Investments = self.value_over_time[increment]
 					target_investments = target_investments.plus(tick_investments)
 
-					unit_type: str = fix_name(get_unit_name(unit, current_frame).upper())
-					if unit_type != "" and hasattr(target_investments, unit_type):
-						setattr(target_investments, unit_type, getattr(target_investments, unit_type) + 1)
-					else:
+					if not self.add_unit_count(target_investments, unit, current_frame):
 						break
 
 					self.value_over_time[increment] = target_investments
 
 				increment += 1
+
+	def add_unit_count(self, target_investments: Investments, unit: Unit, current_frame) -> bool:
+		unit_type: str = fix_name(get_unit_name(unit, current_frame).upper())
+		if unit_type != "" and hasattr(target_investments, unit_type):
+			setattr(target_investments, unit_type, getattr(target_investments, unit_type) + 1)
+			return True
+		else:
+			return False
 
 	def get_race_investment(self):
 		ValueError("You called get_race_investment on the base class!")
