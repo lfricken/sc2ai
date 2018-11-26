@@ -29,7 +29,8 @@ def add_unit(race, unit: Unit):
 		for t, v in unit.type_history.items():
 			if in_exceptions(v.name):
 				v.name = fix_name(v.name)
-			dic.update({v.name.upper(): 0})
+			if v.name != "":
+				dic.update({v.name.upper(): 0})
 
 
 def process_replay(full_file_path):
@@ -58,7 +59,7 @@ i = 0
 for (replay_file, replay_analysis_file) in FileEnumerable.get_replays_dirs_enumerable(show_progress=False):
 	i += 1
 	process_replay(replay_file)
-	if i > 10:
+	if i > 100:
 		break
 
 to_file("terran", terran)

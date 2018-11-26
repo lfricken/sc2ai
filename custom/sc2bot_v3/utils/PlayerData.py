@@ -135,42 +135,74 @@ class PlayerData:
 		self.won_the_game = (vals.player.result == "Win")
 		self.set_value_array(vals.player)
 
-	def set_value_array(self, player):
+	def build_array(self):
 		self.value_over_time: [Investments] = list()
+
 		increment = 0
 		current_frame = 0
-
 		while current_frame < self.total_frames:
-			self.value_over_time.append(self.get_race_investment())
-			self.process_units(player.units, current_frame)
-
-			increment += 1
 			current_frame = get_time_sample(increment)
+			self.value_over_time.append(self.get_race_investment())
+			increment += 1
 
-	def get_race_investment(self):
-		return
-
-	def process_units(self, units: [Unit], current_frame: int):
-		for _ in units:
+	def set_value_array(self, player):
+		self.build_array()
+		for _ in player.units:
 			unit: Unit = _
+
+			if ignore(unit.name):
+				continue
+
 			if not unit.is_army and not unit.is_worker and not unit.is_building:
 				continue
 
-			if unit_exists(unit, current_frame):
-				tick_investments: Investments = self.value_over_time[-1]
-				if is_army(unit):
-					tick_investments.army += unit_value(unit)
-				if is_worker(unit):
-					tick_investments.worker += unit_value(unit)
-				if is_expand(unit):
-					tick_investments.expand += 400  # unit_value(unit)
-				if is_production(unit):
-					tick_investments.production += unit_value(unit)
+			tick_investments: Investments = self.get_race_investment()
+			if is_army(unit):
+				tick_investments.army += unit_value(unit)
+			if is_worker(unit):
+				tick_investments.worker += unit_value(unit)
+			if is_expand(unit):
+				tick_investments.expand += 400  # unit_value(unit)
+			if is_production(unit):
+				tick_investments.production += unit_value(unit)
 
-				unit_name = get_unit_name(unit, current_frame).upper()
-				unit_type: str = fix_name(unit_name)
-				unit_type_count: int = getattr(tick_investments, unit_type) + 1
-				setattr(tick_investments, unit_type, unit_type_count)
+			# process this unit over time
+			increment = 0
+			current_frame = 0
+			while current_frame < self.total_frames:
+				current_frame = get_time_sample(increment)
+
+				if unit_exists(unit, current_frame):
+					target_investments: Investments = self.value_over_time[increment]
+					target_investments = target_investments.plus(tick_investments)
+
+					unit_type: str = fix_name(get_unit_name(unit, current_frame).upper())
+					setattr(target_investments, unit_type, getattr(target_investments, unit_type) + 1)
+
+				increment += 1
+
+	def get_race_investment(self):
+		ValueError("You called get_race_investment on the base class!")
+
+	def process_units(self, unit: Unit, current_frame: int):
+		if not unit.is_army and not unit.is_worker and not unit.is_building:
+			return
+
+		if unit_exists(unit, current_frame):
+			tick_investments: Investments = self.value_over_time[-1]
+			if is_army(unit):
+				tick_investments.army += unit_value(unit)
+			if is_worker(unit):
+				tick_investments.worker += unit_value(unit)
+			if is_expand(unit):
+				tick_investments.expand += 400  # unit_value(unit)
+			if is_production(unit):
+				tick_investments.production += unit_value(unit)
+
+			unit_name = get_unit_name(unit, current_frame).upper()
+			unit_type: str = fix_name(unit_name)
+			unit_type_count: int = getattr(tick_investments, unit_type) + 1
+			setattr(tick_investments, unit_type, unit_type_count)
 
 
 class TerranData(PlayerData):

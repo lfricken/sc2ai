@@ -1,4 +1,7 @@
 
+	def __init__(self):
+		self.investments = np.full(42, 0)
+
 	@property
 	def COMMANDCENTER(self) -> int:
 		return self.investments[4]
@@ -278,3 +281,27 @@
 	@BUNKER.setter
 	def BUNKER(self, value):
 		self.investments[38] = value
+
+	@property
+	def GHOSTACADEMY(self) -> int:
+		return self.investments[39]
+
+	@GHOSTACADEMY.setter
+	def GHOSTACADEMY(self, value):
+		self.investments[39] = value
+
+	@property
+	def GHOST(self) -> int:
+		return self.investments[40]
+
+	@GHOST.setter
+	def GHOST(self, value):
+		self.investments[40] = value
+
+	@property
+	def FUSIONCORE(self) -> int:
+		return self.investments[41]
+
+	@FUSIONCORE.setter
+	def FUSIONCORE(self, value):
+		self.investments[41] = value

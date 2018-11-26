@@ -1,25 +1,41 @@
 import numpy as np
 
 
+def ignore(name: str):
+	exceptions = ["INFESTEDTERRAN", "AUTOTURRET", "BROODLING", "LOCUST"]
+	if any(bad in name for bad in exceptions):
+		return True
+
+	return False
+
+
 def in_exceptions(name: str) -> bool:
 	name = name.upper()
 	exceptions = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED",
-	              "CREEPTUMORQUEEN"]
+	              "CREEPTUMORQUEEN", "THORAP", "SIEGEMODE"]
 	if any(bad in name for bad in exceptions):
 		return True
+
+	if ignore(name):
+		return True
+
 	return False
 
 
 def fix_name(name: str) -> str:
 	name = name.upper()
+
+	if ignore(name):
+		return ""
+
 	# first replace
 	if name == "CREEPTUMORQUEEN":
 		return "CREEPTUMOR"
 
-	if name == "LOCUSTMPFLYING":
-		return "LOCUST"
+	if name == "THORAP":
+		return "THOR"
 
-	remove = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED"]
+	remove = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED", "SIEGEMODE"]
 	for sub_str in remove:
 		if sub_str in name:
 			return name.replace(sub_str, "")
@@ -47,16 +63,19 @@ class Investments:
 	def __init__(self):
 		self.investments = np.full(4, 0)
 
+	def get_new(self) -> "Investments":
+		return self.__class__()
+
 	def plus(self, other: "Investments") -> "Investments":
 		"""Add another investment to this one."""
-		new_value = Investments()
+		new_value = self.get_new()
 		new_value.investments = np.add(self.investments, other.investments)
 
 		return new_value
 
 	def minus(self, other: "Investments") -> "Investments":
 		"""Add another investment to this one."""
-		new_value = Investments()
+		new_value = self.get_new()
 		new_value.investments = np.subtract(self.investments, other.investments)
 
 		return new_value
@@ -108,6 +127,9 @@ class Investments:
 
 
 class ZergInvestments(Investments):
+
+	def get_new(self) -> "ZergInvestments":
+		return self.__class__()
 
 	def __init__(self):
 		self.investments = np.full(38, 0)
@@ -249,146 +271,149 @@ class ZergInvestments(Investments):
 		self.investments[20] = value
 
 	@property
-	def LOCUST(self) -> int:
-		return self.investments[21]
-
-	@LOCUST.setter
-	def LOCUST(self, value):
-		self.investments[21] = value
-
-	@property
 	def BANELINGNEST(self) -> int:
-		return self.investments[22]
+		return self.investments[21]
 
 	@BANELINGNEST.setter
 	def BANELINGNEST(self, value):
-		self.investments[22] = value
-
-	@property
-	def BROODLING(self) -> int:
-		return self.investments[23]
-
-	@BROODLING.setter
-	def BROODLING(self, value):
-		self.investments[23] = value
+		self.investments[21] = value
 
 	@property
 	def BANELING(self) -> int:
-		return self.investments[24]
+		return self.investments[22]
 
 	@BANELING.setter
 	def BANELING(self, value):
-		self.investments[24] = value
+		self.investments[22] = value
 
 	@property
 	def HYDRALISKDEN(self) -> int:
-		return self.investments[25]
+		return self.investments[23]
 
 	@HYDRALISKDEN.setter
 	def HYDRALISKDEN(self, value):
-		self.investments[25] = value
+		self.investments[23] = value
 
 	@property
 	def HYDRALISK(self) -> int:
-		return self.investments[26]
+		return self.investments[24]
 
 	@HYDRALISK.setter
 	def HYDRALISK(self, value):
-		self.investments[26] = value
+		self.investments[24] = value
 
 	@property
 	def SPIRE(self) -> int:
-		return self.investments[27]
+		return self.investments[25]
 
 	@SPIRE.setter
 	def SPIRE(self, value):
-		self.investments[27] = value
+		self.investments[25] = value
 
 	@property
 	def MUTALISK(self) -> int:
-		return self.investments[28]
+		return self.investments[26]
 
 	@MUTALISK.setter
 	def MUTALISK(self, value):
-		self.investments[28] = value
+		self.investments[26] = value
 
 	@property
 	def HIVE(self) -> int:
-		return self.investments[29]
+		return self.investments[27]
 
 	@HIVE.setter
 	def HIVE(self, value):
-		self.investments[29] = value
+		self.investments[27] = value
 
 	@property
 	def ULTRALISKCAVERN(self) -> int:
-		return self.investments[30]
+		return self.investments[28]
 
 	@ULTRALISKCAVERN.setter
 	def ULTRALISKCAVERN(self, value):
-		self.investments[30] = value
+		self.investments[28] = value
 
 	@property
 	def VIPER(self) -> int:
-		return self.investments[31]
+		return self.investments[29]
 
 	@VIPER.setter
 	def VIPER(self, value):
-		self.investments[31] = value
+		self.investments[29] = value
 
 	@property
 	def GREATERSPIRE(self) -> int:
-		return self.investments[32]
+		return self.investments[30]
 
 	@GREATERSPIRE.setter
 	def GREATERSPIRE(self, value):
-		self.investments[32] = value
+		self.investments[30] = value
 
 	@property
 	def ULTRALISK(self) -> int:
-		return self.investments[33]
+		return self.investments[31]
 
 	@ULTRALISK.setter
 	def ULTRALISK(self, value):
-		self.investments[33] = value
+		self.investments[31] = value
 
 	@property
 	def CORRUPTOR(self) -> int:
-		return self.investments[34]
+		return self.investments[32]
 
 	@CORRUPTOR.setter
 	def CORRUPTOR(self, value):
-		self.investments[34] = value
+		self.investments[32] = value
 
 	@property
 	def BROODLORD(self) -> int:
-		return self.investments[35]
+		return self.investments[33]
 
 	@BROODLORD.setter
 	def BROODLORD(self, value):
-		self.investments[35] = value
+		self.investments[33] = value
 
 	@property
 	def SPINECRAWLER(self) -> int:
-		return self.investments[36]
+		return self.investments[34]
 
 	@SPINECRAWLER.setter
 	def SPINECRAWLER(self, value):
-		self.investments[36] = value
+		self.investments[34] = value
 
 	@property
 	def INFESTOR(self) -> int:
-		return self.investments[37]
+		return self.investments[35]
 
 	@INFESTOR.setter
 	def INFESTOR(self, value):
+		self.investments[35] = value
+
+	@property
+	def NYDUSNETWORK(self) -> int:
+		return self.investments[36]
+
+	@NYDUSNETWORK.setter
+	def NYDUSNETWORK(self, value):
+		self.investments[36] = value
+
+	@property
+	def NYDUSWORM(self) -> int:
+		return self.investments[37]
+
+	@NYDUSWORM.setter
+	def NYDUSWORM(self, value):
 		self.investments[37] = value
 
 
 class TerranInvestments(Investments):
 
+	def get_new(self) -> "TerranInvestments":
+		return self.__class__()
+
 	def __init__(self):
-		self.investments = np.full(39, 0)
+		self.investments = np.full(42, 0)
 
 	@property
 	def COMMANDCENTER(self) -> int:
@@ -669,6 +694,30 @@ class TerranInvestments(Investments):
 	@BUNKER.setter
 	def BUNKER(self, value):
 		self.investments[38] = value
+
+	@property
+	def GHOSTACADEMY(self) -> int:
+		return self.investments[39]
+
+	@GHOSTACADEMY.setter
+	def GHOSTACADEMY(self, value):
+		self.investments[39] = value
+
+	@property
+	def GHOST(self) -> int:
+		return self.investments[40]
+
+	@GHOST.setter
+	def GHOST(self, value):
+		self.investments[40] = value
+
+	@property
+	def FUSIONCORE(self) -> int:
+		return self.investments[41]
+
+	@FUSIONCORE.setter
+	def FUSIONCORE(self, value):
+		self.investments[41] = value
 
 
 class ProtossInvestments(Investments):
