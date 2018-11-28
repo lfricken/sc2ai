@@ -5,8 +5,13 @@ index_start = 4
 def gen_investment(indexer: int) -> str:
 	prop = str()
 	prop += "\n"
+	prop += "\tdef num_values(self) -> int:\n"
+	prop += "\t\treturn {}\n".format(indexer)
+	prop += "\n"
+
+	prop += "\n"
 	prop += "\tdef __init__(self):\n"
-	prop += "\t\tself.investments = np.full({}, 0)\n".format(indexer)
+	prop += "\t\tself.investments = np.full(self.num_values(), 0)\n"
 	return prop
 
 def gen_prop(prop_name, indexer) -> str:

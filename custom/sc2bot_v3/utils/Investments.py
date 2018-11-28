@@ -131,8 +131,11 @@ class ZergInvestments(Investments):
 	def get_new(self) -> "ZergInvestments":
 		return self.__class__()
 
+	def num_values(self) -> int:
+		return 38
+
 	def __init__(self):
-		self.investments = np.full(38, 0)
+		self.investments = np.full(self.num_values(), 0)
 
 	@property
 	def HATCHERY(self) -> int:
@@ -412,8 +415,11 @@ class TerranInvestments(Investments):
 	def get_new(self) -> "TerranInvestments":
 		return self.__class__()
 
+	def num_values(self) -> int:
+		return 42
+
 	def __init__(self):
-		self.investments = np.full(42, 0)
+		self.investments = np.full(self.num_values(), 0)
 
 	@property
 	def COMMANDCENTER(self) -> int:
