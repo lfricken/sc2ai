@@ -9,15 +9,14 @@ import numpy as np
 import tensorflow as tf
 
 from utils.FileEnumerable import FileEnumerable
-from utils.Investments import Investments
-from utils.TrainingData import DataPoint
-from utils.TrainingData import TrainingData
+from utils.Investments import *
+from utils.TrainingData import *
 
 learning_rate = 10
 training_epochs = 10
 num_test_samples = 30
 
-num_inputs = Investments.num_investment_options() * 2
+num_inputs = ZergInvestments.num_values() + TerranInvestments.num_values()
 num_hidden_1 = 5
 num_outputs = 2  # win loss
 
@@ -45,19 +44,12 @@ def get_training_enumerable() -> Iterator[TrainingData]:
 		yield _
 
 
-def randomize_data(data_array: [DataPoint]):
-	for i in range(len(data_array)):
-		if np.random.randint(0, 2) == 1:  # flip which player slot won
-			data_array[i].inputs = np.roll(data_array[i].inputs, int(num_inputs / 2))
-			data_array[i].outputs = np.roll(data_array[i].outputs, int(num_outputs / 2))
-		else:
-			data_array[i].outputs = np.array(data_array[i].outputs)
-
+def randomize_data(data_array):
 	np.random.shuffle(data_array)
 
 
 def generate_data() -> ([[int]], [[int]]):
-	training_data_array: [DataPoint] = []
+	training_data_array: [] = []
 	for _ in FileEnumerable.get_analysis_enumerable():
 		data: TrainingData = _
 		training_data_array = np.append(training_data_array, data.data_points)
@@ -67,7 +59,7 @@ def generate_data() -> ([[int]], [[int]]):
 	_input_array: [[int]] = []
 	_output_array: [[int]] = []
 	for _ in training_data_array:
-		data: DataPoint = _
+		data = _
 		_input_array.append(data.inputs)
 		_output_array.append(data.outputs)
 

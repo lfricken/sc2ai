@@ -1,133 +1,12 @@
-import numpy as np
 
-
-def ignore(name: str):
-	exceptions = ["INFESTEDTERRAN", "AUTOTURRET", "BROODLING", "LOCUST"]
-	if any(bad in name for bad in exceptions):
-		return True
-
-	return False
-
-
-def in_exceptions(name: str) -> bool:
-	name = name.upper()
-	exceptions = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED",
-	              "CREEPTUMORQUEEN", "THORAP", "SIEGEMODE"]
-	if any(bad in name for bad in exceptions):
-		return True
-
-	if ignore(name):
-		return True
-
-	return False
-
-
-def fix_name(name: str) -> str:
-	name = name.upper()
-
-	if ignore(name):
-		return ""
-
-	# first replace
-	if name == "CREEPTUMORQUEEN":
-		return "CREEPTUMOR"
-
-	if name == "THORAP":
-		return "THOR"
-
-	remove = ["BURROWED", "FLYING", "UPROOTED", "COCOON", "ASSAULT", "BATTLE", "SIEGED", "LOWERED", "SIEGEMODE"]
-	for sub_str in remove:
-		if sub_str in name:
-			return name.replace(sub_str, "")
-
-	return name
-
-
-class Investments:
+class TerranInvestments:
 	investments: np.ndarray = None
 
-	def get_new(self) -> "Investments":
-		return self.__class__()
-
-	def plus(self, other: "Investments") -> "Investments":
-		"""Add another investment to this one."""
-		new_value = self.get_new()
-		new_value.investments = np.add(self.investments, other.investments)
-
-		return new_value
-
-	def minus(self, other: "Investments") -> "Investments":
-		"""Add another investment to this one."""
-		new_value = self.get_new()
-		new_value.investments = np.subtract(self.investments, other.investments)
-
-		return new_value
-
-	def is_less_than_or_equal_to(self, other: "Investments") -> bool:
-		temp = other.minus(self)
-		return (temp.investments >= 0).all()
-
-
-class CoreInvestments(Investments):
-	"""
-	How many resources, and invested in what?
-	"""
-
-	@staticmethod
-	def num_values() -> int:
-		return 4
-
-	investments: np.ndarray = None
-
-	def __init__(self):
-		self.investments = np.full(CoreInvestments.num_values(), 0)
-
-	@property
-	def army(self) -> int:
-		"""Resources in military units."""
-		return self.investments[0]
-
-	@army.setter
-	def army(self, value):
-		self.investments[0] = value
-
-	@property
-	def production(self) -> int:
-		"""Resources in production potential."""
-		return self.investments[1]
-
-	@production.setter
-	def production(self, value):
-		self.investments[1] = value
-
-	@property
-	def worker(self) -> int:
-		"""Resources in worker units."""
-		return self.investments[2]
-
-	@worker.setter
-	def worker(self, value):
-		self.investments[2] = value
-
-	@property
-	def expand(self) -> int:
-		"""Resources in town centers."""
-		return self.investments[3]
-
-	@expand.setter
-	def expand(self, value):
-		self.investments[3] = value
-
-
-class TerranInvestments(Investments):
-	investments: np.ndarray = None
-
-	@staticmethod
-	def num_values() -> int:
+	def num_values(self) -> int:
 		return 38
 
 	def __init__(self):
-		self.investments = np.full(TerranInvestments.num_values(), 0)
+		self.investments = np.full(self.num_values(), 0)
 
 	@property
 	def COMMANDCENTER(self) -> int:
@@ -433,16 +312,14 @@ class TerranInvestments(Investments):
 	def FUSIONCORE(self, value):
 		self.investments[37] = value
 
-
-class ZergInvestments(Investments):
+class ZergInvestments:
 	investments: np.ndarray = None
 
-	@staticmethod
-	def num_values() -> int:
+	def num_values(self) -> int:
 		return 34
 
 	def __init__(self):
-		self.investments = np.full(ZergInvestments.num_values(), 0)
+		self.investments = np.full(self.num_values(), 0)
 
 	@property
 	def HATCHERY(self) -> int:
@@ -715,7 +592,3 @@ class ZergInvestments(Investments):
 	@NYDUSWORM.setter
 	def NYDUSWORM(self, value):
 		self.investments[33] = value
-
-
-class ProtossInvestments:
-	investments: np.ndarray = None
