@@ -66,18 +66,16 @@ class Investments:
 	def get_new(self) -> "Investments":
 		return self.__class__()
 
-	def plus(self, other: "Investments") -> "Investments":
+	def __add__(self, other):
 		"""Add another investment to this one."""
 		new_value = self.get_new()
 		new_value.investments = np.add(self.investments, other.investments)
-
 		return new_value
 
-	def minus(self, other: "Investments") -> "Investments":
-		"""Add another investment to this one."""
+   def __sub__(self, other):
+		"""Subtract another investment to this one."""
 		new_value = self.get_new()
 		new_value.investments = np.subtract(self.investments, other.investments)
-
 		return new_value
 
 	def is_less_than_or_equal_to(self, other: "Investments") -> bool:
