@@ -118,17 +118,17 @@ def get_unit_name(unit: Unit, current_frame: int) -> str:
 
 
 class DataPoint:
-	core_values = [CoreInvestments]
+	core_values: Investments = None
 	"""We spent money on this during that time."""
-	unit_count = []
+	unit_count: Investments = None
 	"""We have money in these things during that time."""
-	unit_count_deltas = []
+	unit_count_deltas: Investments = None
 	"""We spent money on this during that time."""
 
 	def __init__(self, player_data):
-		self.core_values: [] = CoreInvestments()
-		self.unit_count: [] = player_data.get_race_investment()
-		self.unit_count_deltas: [] = player_data.get_race_investment()
+		self.core_values: Investments = CoreInvestments()
+		self.unit_count: Investments = player_data.get_race_investment()
+		self.unit_count_deltas: Investments = player_data.get_race_investment()
 
 
 class PlayerData:
@@ -182,8 +182,9 @@ class PlayerData:
 			current_frame = 0
 			added = False
 			while current_frame < self.total_frames:
-
-				if unit_exists(unit, current_frame):
+				# because we check against current frame and not next frame, we actually check if a unit existed
+				# at the beginning of this increment, and not th end
+				if unit_exists(unit, get_time_sample(increment + 1)):
 					added = True
 
 					# core

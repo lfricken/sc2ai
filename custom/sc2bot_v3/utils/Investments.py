@@ -44,7 +44,7 @@ def fix_name(name: str) -> str:
 
 
 class Investments:
-	investments: np.ndarray = None
+	investments: [int] = None
 
 	def get_new(self) -> "Investments":
 		return self.__class__()
@@ -77,7 +77,7 @@ class CoreInvestments(Investments):
 	def num_values() -> int:
 		return 4
 
-	investments: np.ndarray = None
+	investments: [int] = None
 
 	def __init__(self):
 		self.investments = np.full(CoreInvestments.num_values(), 0)
@@ -435,7 +435,7 @@ class TerranInvestments(Investments):
 
 
 class ZergInvestments(Investments):
-	investments: np.ndarray = None
+	investments: [int] = None
 
 	@staticmethod
 	def num_values() -> int:

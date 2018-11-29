@@ -5,11 +5,9 @@ from __future__ import print_function
 
 from typing import Iterator
 
-import numpy as np
 import tensorflow as tf
 
 from utils.FileEnumerable import FileEnumerable
-from utils.Investments import *
 from utils.TrainingData import *
 
 learning_rate = 10
@@ -17,8 +15,8 @@ training_epochs = 10
 num_test_samples = 30
 
 num_inputs = ZergInvestments.num_values() + TerranInvestments.num_values()
-num_hidden_1 = 5
-num_outputs = 2  # win loss
+num_outputs = ZergInvestments.num_values()  # win loss
+num_hidden_1 = num_outputs + ((num_inputs - num_outputs) / 2)
 
 save_directory = "brains/{}_{}_{}_sc2bot_v2_brain.ckpt".format(num_inputs, num_hidden_1, num_outputs)
 
@@ -48,11 +46,28 @@ def randomize_data(data_array):
 	np.random.shuffle(data_array)
 
 
+class Point:
+	inputs: [int] = None
+	outputs: [int] = None
+
+	def __init__(self):
+		self.inputs = []
+		self.outputs = []
+
+
 def generate_data() -> ([[int]], [[int]]):
-	training_data_array: [] = []
+	training_data_array: [Point] = []
+
 	for _ in FileEnumerable.get_analysis_enumerable():
-		data: TrainingData = _
-		training_data_array = np.append(training_data_array, data.data_points)
+		training_data: TrainingData = _
+
+		for _ in training_data.data:
+			data_point: CombinedDataPoint = _
+			if np.count_nonzero(data_point.us.unit_count_deltas.investments) > 0:
+				point = Point()
+				point.inputs = np.concatenate(data_point.us.unit_count.investments, data_point.them.unit_count.investments)
+				point.outputs = data_point.us.unit_count_deltas.investments
+				training_data_array.append(point)
 
 	randomize_data(training_data_array)
 
