@@ -25,14 +25,15 @@ np.set_printoptions(precision=2)
 
 
 # Create model
-def add_middle_layer(existing_network):
-	out = tf.layers.dense(inputs=existing_network, units=num_hidden_1, activation=tf.nn.sigmoid)
-	return out
+def add_middle_layer(network):
+	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
+	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
+	return network
 
 
-def add_output_layer(existing_network):
-	existing_network = tf.layers.dense(inputs=existing_network, units=num_outputs, activation=tf.nn.sigmoid)
-	return existing_network
+def add_output_layer(network):
+	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.sigmoid)
+	return network
 
 
 def add_softmax_layer(existing_network) -> tf.nn.softmax:
@@ -58,6 +59,9 @@ class Point:
 		self.outputs = []
 
 
+def argmax(x: [int]) -> int:
+	return max(range(len(x)), key=x.__getitem__)
+
 def generate_data() -> ([[int]], [[int]]):
 	training_data_array: [Point] = []
 
@@ -71,7 +75,9 @@ def generate_data() -> ([[int]], [[int]]):
 				delta = data_point.us.unit_count_deltas
 				start_count = data_point.us.unit_count.minus(delta)
 				point.inputs = np.concatenate([start_count.investments, data_point.them.unit_count.investments])
-				point.outputs = delta.investments
+				index_max = argmax(delta.investments)
+				point.outputs = np.full(len(delta.investments), 0)
+				point.outputs[index_max] = 1
 				training_data_array.append(point)
 
 	randomize_data(training_data_array)
@@ -96,19 +102,21 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 
 	display_input = [format % member for member in test_input]
 	display_output = test_output[0][0].tolist()
+	output = argmax(display_output)
+	answer = argmax(test_answer)
 	display_output = [format % member for member in display_output]
 	display_answer = [format % member for member in test_answer]
 
 	print("Input:  {}".format(display_input))
-	print("Output: {}".format(display_output))
-	print("Answer: {}".format(display_answer))
+	print("Output:{} {}".format(output, display_output))
+	print("Answer:{} {}".format(answer, display_answer))
 
 
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
 	# Test model
 	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
 	tests = []
-	compute_correct_prediction = tf.equal(tf.argmax(network), tf.argmax(output_type))
+	compute_correct_prediction = tf.equal(tf.argmax(network, 1), tf.argmax(output_type, 1))
 	accuracy: tf.reduce_mean = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
 	accuracy_value = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
 	tests.append(accuracy_value)
@@ -129,7 +137,7 @@ def run():
 	network = add_middle_layer(input_type)
 	network = add_output_layer(network)
 	# Define loss and optimizer
-	cost = tf.reduce_mean(tf.losses.mean_squared_error(labels=network, predictions=output_type))
+	cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type))
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
 
 	saver = tf.train.Saver()
@@ -148,6 +156,9 @@ def run():
 
 		print("Training.")
 		for epoch in range(training_epochs):
+
+			test_input = input_data_full[epoch]
+			test_output = output_data_full[epoch]
 
 			# batches should actually not be all the data
 			for batch in range(num_batches):
