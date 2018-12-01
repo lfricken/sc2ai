@@ -148,6 +148,9 @@ class PlayerData:
 		self.total_frames = vals.total_frames
 		self.won_the_game: bool = (vals.player.result == "Win")
 
+		if self.won_the_game:
+			print(vals.player.play_race)
+
 		self.data: [DataPoint] = []
 		increment = 0
 		current_frame = 0
