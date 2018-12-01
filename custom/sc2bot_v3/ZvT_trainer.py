@@ -12,8 +12,9 @@ from utils.TrainingData import *
 
 learning_rate = 10
 training_epochs = 100
-num_batches = 50
 num_test_samples = 30
+
+batch_size = 30
 
 num_inputs = ZergInvestments.num_values() + TerranInvestments.num_values()
 num_outputs = ZergInvestments.num_values()  # win loss
@@ -26,7 +27,6 @@ np.set_printoptions(precision=2)
 
 # Create model
 def add_middle_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
 	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
 	return network
 
@@ -155,17 +155,28 @@ def run():
 		print_manual_evaluation(session, network, input_type, test_input, test_output)
 
 		print("Training.")
+
+		num_samples = len(input_data_full)
+		num_batches = num_samples // batch_size
+
 		for epoch in range(training_epochs):
 
 			test_input = input_data_full[epoch]
 			test_output = output_data_full[epoch]
+			avg_cost = 0
 
 			# batches should actually not be all the data
+			batch_begin = 0
 			for batch in range(num_batches):
+				batch_end = batch_begin + batch_size
 				# fetches determines what to "compute"
 				# passing trainer implies you want to compute, and therefor influence, the values of the network
-				session.run(fetches=[trainer], feed_dict={input_type: input_data_full, output_type: output_data_full})
+				t, c = session.run(fetches=[trainer, cost], feed_dict={input_type: input_data_full[batch_begin:batch_end], output_type: output_data_full[batch_begin:batch_end]})
+				avg_cost += c / num_batches
+				batch_begin += batch_size
 
+			#if epoch % 10 == 0:
+			print("Epoch {} Cost: {}".format(epoch, avg_cost))
 			print_accuracy(session, network, input_data_full, output_data_full, input_type, output_type, "after")
 			print_manual_evaluation(session, network, input_type, test_input, test_output)
 
