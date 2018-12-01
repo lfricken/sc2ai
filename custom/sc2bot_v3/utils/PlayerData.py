@@ -89,7 +89,7 @@ def get_time_delta() -> int:
 	return 112  # 22.4 frames per second * 5seconds
 
 
-def get_time_sample(increment: int) -> int:
+def get_frame(increment: int) -> int:
 	"""Use 5 second increments."""
 	return get_time_delta() * increment
 
@@ -154,7 +154,7 @@ class PlayerData:
 		while current_frame < self.total_frames:
 			self.data.append(DataPoint(self))
 			increment += 1
-			current_frame = get_time_sample(increment)
+			current_frame = get_frame(increment)
 
 		self.set_value_array(vals.player.units)
 
@@ -182,13 +182,14 @@ class PlayerData:
 			current_frame = 0
 			added = False
 			while current_frame < self.total_frames:
+				current_frame = get_frame(increment + 1)
 				# because we check against current frame and not next frame, we actually check if a unit existed
 				# at the beginning of this increment, and not th end
-				if unit_exists(unit, get_time_sample(increment + 1)):
+				if unit_exists(unit, current_frame):
 					added = True
 
 					# core
-					core_values = self.data[increment].core_values
+					core_values: CoreInvestments = self.data[increment].core_values
 					self.add_core(unit, core_values)
 
 					# counts
@@ -202,7 +203,6 @@ class PlayerData:
 					break  # so we can stop
 
 				increment += 1
-				current_frame = get_time_sample(increment)
 
 	def add_unit_count(self, target_investments, unit: Unit, current_frame) -> bool:
 		unit_type: str = fix_name(get_unit_name(unit, current_frame).upper())

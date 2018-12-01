@@ -65,8 +65,10 @@ def generate_data() -> ([[int]], [[int]]):
 			data_point: CombinedDataPoint = _
 			if np.count_nonzero(data_point.us.unit_count_deltas.investments) > 0:
 				point = Point()
-				point.inputs = np.concatenate(data_point.us.unit_count.investments, data_point.them.unit_count.investments)
-				point.outputs = data_point.us.unit_count_deltas.investments
+				delta = data_point.us.unit_count_deltas
+				start_count = data_point.us.unit_count.minus(delta)
+				point.inputs = np.concatenate([start_count.investments, data_point.them.unit_count.investments])
+				point.outputs = delta.investments
 				training_data_array.append(point)
 
 	randomize_data(training_data_array)

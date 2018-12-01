@@ -28,12 +28,12 @@ def process_replay(replay: Replay) -> TrainingData:
 		zerg = 1
 		other = 0
 
-	vals = type('', (), {})()
+	vals = type('', (), {})()  # lets you assign any variable
 	vals.player = replay.players[zerg]
 	vals.total_frames = replay.frames
 	player_1_data = ZergData(vals)
 
-	vals = type('', (), {})()
+	vals = type('', (), {})()  # lets you assign any variable
 	vals.player = replay.players[other]
 	vals.total_frames = replay.frames
 	player_2_data = TerranData(vals)
