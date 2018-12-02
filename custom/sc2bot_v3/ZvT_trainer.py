@@ -4,12 +4,8 @@
 from __future__ import print_function
 
 import random
-from typing import Iterator
 
-import tensorflow as tf
-
-from utils.FileEnumerable import FileEnumerable
-from utils.TrainingData import *
+from utils.NetworkValues import *
 
 percent_train = 0.5  # what percentage of the data do we use to train rather than test?
 learning_rate = 10
@@ -18,39 +14,7 @@ num_test_samples = 30
 
 batch_size = 30
 
-num_inputs = ZergInvestments.num_values() + TerranInvestments.num_values()
-num_outputs = 2  # win loss
-split_input_output_count = num_outputs + ((num_inputs - num_outputs) / 2)
-num_hidden_1 = int(split_input_output_count * 1.5)
- 
-save_directory = "brains/{}_{}_{}_sc2bot_v2_brain.ckpt".format(num_inputs, num_hidden_1, num_outputs)
-
 np.set_printoptions(precision=2)
-
-
-# Create model
-def add_middle_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
-	return network
-
-
-def add_output_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.sigmoid)
-	return network
-
-
-def add_softmax_layer(network):
-	network = tf.nn.softmax(network)
-	return network
-
-
-def get_training_enumerable() -> Iterator[TrainingData]:
-	for _ in FileEnumerable.get_analysis_enumerable():
-		yield _
-
-
-def randomize_data(data_array):
-	np.random.shuffle(data_array)
 
 
 class Point:
@@ -62,16 +26,14 @@ class Point:
 		self.outputs = []
 
 
-def argmax(x: [int]) -> int:
-	return max(range(len(x)), key=x.__getitem__)
+def randomize_data(data_array):
+	np.random.shuffle(data_array)
 
 
 def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 	training_data_array: [Point] = []
 
-	for _ in FileEnumerable.get_analysis_enumerable():
-		training_data: TrainingData = _
-
+	for training_data in get_training_enumerable():
 		for _ in training_data.data:
 			data_point: CombinedDataPoint = _
 			point = Point()
@@ -148,13 +110,12 @@ def run():
 	print("Class Distribution: {}".format(display_answer))
 
 	# tf Graph input
-	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
+	input_type = get_input_type()
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
 	# Construct model
-	network = add_middle_layer(input_type)
-	network = add_output_layer(network)
-	network = add_softmax_layer(network)
+	network = build_model(input_type)
+
 	# Define loss and optimizer
 	cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=output_type))
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
