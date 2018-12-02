@@ -41,7 +41,7 @@ class PlotValues:
 		self.plot = plot
 
 
-def plot_data(lines: [PlotValues], plot: int):
+def plot_data(lines: [PlotValues]):
 	data = dict()
 	data["x"] = np.arange(0, time_delta * len(lines[0].data), time_delta)
 	for _ in lines:
@@ -61,8 +61,7 @@ def plot_data(lines: [PlotValues], plot: int):
 
 def run_test():
 	network = Network()
-	lines_to_plot1: [PlotValues] = list()
-	lines_to_plot2: [PlotValues] = list()
+	lines_to_plot: [PlotValues] = list()
 	for _ in FileEnumerable.get_analysis_enumerable():
 		training_data: TrainingData = _
 		p1: [int] = []
@@ -82,16 +81,15 @@ def run_test():
 		# worker.append(replay_data.us.core_values.worker)
 		# production.append(replay_data.us.core_values.production)
 
-		lines_to_plot1.append(PlotValues("Army1", "red", "-", army1, 0))
-		lines_to_plot1.append(PlotValues("Army2", "blue", "-", army2, 0))
-		lines_to_plot2.append(PlotValues("Odds", "red", "-", p1, 1))
+		lines_to_plot.append(PlotValues("Army1", "red", "-", army1, 0))
+		lines_to_plot.append(PlotValues("Army2", "blue", "-", army2, 0))
+		lines_to_plot.append(PlotValues("Odds", "red", "-", p1, 1))
 		# lines_to_plot.append(PlotValues("Production", "green", "--", production))
 		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 
 		break
 
-	plot_data(lines_to_plot1 + lines_to_plot2, 0)
-
+	plot_data(lines_to_plot)
 	plt.show()
 
 
