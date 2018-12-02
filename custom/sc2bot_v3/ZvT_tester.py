@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
+import numpy as np
 
-max_x = 4
+from utils.FileEnumerable import FileEnumerable
+from utils.TrainingData import *
 
 
 class PlotValues:
@@ -20,11 +21,28 @@ class PlotValues:
 
 def run():
 	lines_to_plot: [PlotValues] = list()
-	lines_to_plot.append(PlotValues("Army", "blue", "-", np.random.randn(4)))
-	lines_to_plot.append(PlotValues("Expand", "red", "--", np.random.randn(4)))
+	for _ in FileEnumerable.get_analysis_enumerable():
+		training_data: TrainingData = _
+		army: [int] = []
+		expand: [int] = []
+		worker: [int] = []
+		production: [int] = []
+		for __ in training_data.data:
+			replay_data: CombinedDataPoint = __
+			army.append(replay_data.us.core_values.army)
+			expand.append(replay_data.us.core_values.expand)
+			worker.append(replay_data.us.core_values.worker)
+			production.append(replay_data.us.core_values.production)
+
+		lines_to_plot.append(PlotValues("Army", "red", "-", army))
+		lines_to_plot.append(PlotValues("Worker", "blue", "--", worker))
+		lines_to_plot.append(PlotValues("Production", "green", "--", production))
+		lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
+
+		break
 
 	data = dict()
-	data["x"] = range(0, max_x)
+	data["x"] = np.arange(0, 5*len(lines_to_plot[0].data), 5)
 	for _ in lines_to_plot:
 		line: PlotValues = _
 		data[line.label] = line.data

@@ -126,7 +126,7 @@ class DataPoint:
 	"""We spent money on this during that time."""
 
 	def __init__(self, player_data):
-		self.core_values: Investments = CoreInvestments()
+		self.core_values: CoreInvestments = CoreInvestments()
 		self.unit_count: Investments = player_data.get_race_investment()
 		self.unit_count_deltas: Investments = player_data.get_race_investment()
 
