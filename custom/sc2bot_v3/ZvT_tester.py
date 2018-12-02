@@ -48,13 +48,16 @@ def run():
 		data[line.label] = line.data
 
 	df = pd.DataFrame(data)
-
+	fig, ax = plt.subplots(nrows=2, ncols=2)
 	for _ in lines_to_plot:
 		line: PlotValues = _
-		plt.plot("x", line.label, data=df, marker="", color=line.color, linewidth=2, linestyle=line.style)
+		for row in ax:
+			for col in row:
+				col.plot("x", line.label, data=df, marker="", color=line.color, linewidth=2, linestyle=line.style)
+				col.legend()
+				col.set_ylabel("Value")
+				col.set_xlabel("Seconds")
 
-	plt.ylabel("Values")
-	plt.legend()
 	plt.show()
 
 
