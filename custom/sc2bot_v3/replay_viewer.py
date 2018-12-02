@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 from utils.FileEnumerable import FileEnumerable
 from utils.TrainingData import *
+
+time_delta = get_time_delta_seconds()
 
 
 class PlotValues:
@@ -42,7 +43,7 @@ def run():
 		break
 
 	data = dict()
-	data["x"] = np.arange(0, 5*len(lines_to_plot[0].data), 5)
+	data["x"] = np.arange(0, time_delta * len(lines_to_plot[0].data), time_delta)
 	for _ in lines_to_plot:
 		line: PlotValues = _
 		data[line.label] = line.data

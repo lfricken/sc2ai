@@ -84,9 +84,13 @@ def is_production(unit: Unit) -> bool:
 		return True
 
 
+def get_time_delta_seconds() -> int:
+	return 5
+
+
 def get_time_delta() -> int:
 	"""Use 5 second increments."""
-	return 112  # 22.4 frames per second * 5seconds
+	return int(22.4 * get_time_delta_seconds())  # 22.4 frames per second
 
 
 def get_frame(increment: int) -> int:
