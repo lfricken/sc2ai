@@ -1,26 +1,29 @@
-from utils.PlayerData import PlayerData
+from utils.PlayerData import *
 
 
-class DataPoint:
-	player_1: PlayerData
-	player_2: PlayerData
+class CombinedDataPoint:
+	us: DataPoint
+	them: DataPoint
 	who_won: [int]
 
-	def __init__(self, p_1, p_2, winner):
-		self.player_1 = p_1
-		self.player_2 = p_2
-		self.outputs: [int] = winner
+	def __init__(self, us, them, winner):
+		self.us = us
+		self.them = them
+		self.who_won = winner
 
 
 class TrainingData:
 	""""""
 
-	data_points: [DataPoint] = None
+	data: [CombinedDataPoint]
 
-	def __init__(self, player_1: PlayerData, player_2: PlayerData):
-		self.data_points: [DataPoint] = []
+	def __init__(self, us: PlayerData, them: PlayerData):
+		self.data: [CombinedDataPoint] = []
 
-		for increment in range(len(player_1.value_over_time)):
-			output = [player_1.won_the_game, player_2.won_the_game]
-			data = DataPoint(player_1, player_2, output)
-			self.data_points.append(data)
+		for increment in range(len(us.data)):
+			us_point = us.data[increment]
+			them_point = them.data[increment]
+			winner = [us.won_the_game, them.won_the_game]
+
+			data_point = CombinedDataPoint(us_point, them_point, winner)
+			self.data.append(data_point)

@@ -4,7 +4,6 @@
 # 3. write the data to a file
 
 import pickle
-import time
 
 import sc2reader
 from sc2reader.resources import Replay
@@ -29,40 +28,36 @@ def process_replay(replay: Replay) -> TrainingData:
 		zerg = 1
 		other = 0
 
-	vals = type('', (), {})()
+	vals = type('', (), {})()  # lets you assign any variable
 	vals.player = replay.players[zerg]
 	vals.total_frames = replay.frames
 	player_1_data = ZergData(vals)
 
-	vals = type('', (), {})()
+	vals = type('', (), {})()  # lets you assign any variable
 	vals.player = replay.players[other]
 	vals.total_frames = replay.frames
 	player_2_data = TerranData(vals)
 
-	# have Zerg (us) be first
-	if replay.players[0].play_race == "Zerg":
-		data = TrainingData(player_1_data, player_2_data)
-	else:
-		data = TrainingData(player_2_data, player_1_data)
+	data = TrainingData(player_1_data, player_2_data)
 
 	return data
 
 
 for (replay_file, replay_analysis_file) in FileEnumerable.get_replays_dirs_enumerable():
 
-	#start = time.time()
+	# start = time.time()
 	loaded_replay: Replay = sc2reader.load_replay(replay_file, load_level=3)
-	#end = time.time()
-	#print("Reading took " + str(end - start))
+	# end = time.time()
+	# print("Reading took " + str(end - start))
 
-	#start = time.time()
+	# start = time.time()
 	training_data = process_replay(loaded_replay)
-	#end = time.time()
-	#print("Analyzing took " + str(end - start))
+	# end = time.time()
+	# print("Analyzing took " + str(end - start))
 
-	#start = time.time()
+	# start = time.time()
 	if training_data is not None:
 		with open(replay_analysis_file, "wb") as outfile:
 			pickle.dump(training_data, outfile, pickle.HIGHEST_PROTOCOL)
-	#end = time.time()
-	#print("Saving took " + str(end - start))
+# end = time.time()
+# print("Saving took " + str(end - start))

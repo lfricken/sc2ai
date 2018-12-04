@@ -84,12 +84,16 @@ def is_production(unit: Unit) -> bool:
 		return True
 
 
+def get_time_delta_seconds() -> int:
+	return 5
+
+
 def get_time_delta() -> int:
 	"""Use 5 second increments."""
-	return 112  # 22.4 frames per second * 5seconds
+	return int(22.4 * get_time_delta_seconds())  # 22.4 frames per second
 
 
-def get_time_sample(increment: int) -> int:
+def get_frame(increment: int) -> int:
 	"""Use 5 second increments."""
 	return get_time_delta() * increment
 
@@ -117,46 +121,51 @@ def get_unit_name(unit: Unit, current_frame: int) -> str:
 	return name
 
 
+class DataPoint:
+	core_values: Investments = None
+	"""We spent money on this during that time."""
+	unit_count: Investments = None
+	"""We have money in these things during that time."""
+	unit_count_deltas: Investments = None
+	"""We spent money on this during that time."""
+
+	def __init__(self, player_data):
+		self.core_values: CoreInvestments = CoreInvestments()
+		self.unit_count: Investments = player_data.get_race_investment()
+		self.unit_count_deltas: Investments = player_data.get_race_investment()
+
+
 class PlayerData:
 	"""
 	Contains data about this player over the course of the game.
 	Used for a neural network to train on successful investment strategies.
 	"""
 
-	value_over_time = [Investments]
-	"""We have money in these things during that time."""
-	value_deltas = [Investments]
-	"""We spent money on this during that time."""
-
-	won_the_game: bool
-	"""True if this player won the game."""
 	total_frames: int = 0
 	"""How many frames were in the whole game."""
+	won_the_game: bool
+	"""True if this player won the game."""
+	data: [DataPoint] = [DataPoint]
+	""""""
 
 	def __init__(self, vals):
 		self.total_frames = vals.total_frames
-		self.won_the_game = (vals.player.result == "Win")
+		self.won_the_game: bool = (vals.player.result == "Win")
+
+		if self.won_the_game:
+			print(vals.player.play_race)
+
+		self.data: [DataPoint] = []
+		increment = 0
+		current_frame = 0
+		while current_frame < self.total_frames:
+			self.data.append(DataPoint(self))
+			increment += 1
+			current_frame = get_frame(increment)
+
 		self.set_value_array(vals.player.units)
 
-	def build_array(self):
-		self.value_over_time: [Investments] = list()
-		increment = 0
-		current_frame = 0
-		while current_frame < self.total_frames:
-			current_frame = get_time_sample(increment)
-			self.value_over_time.append(self.get_race_investment())
-			increment += 1
-
-		self.value_deltas: [Investments] = list()
-		increment = 0
-		current_frame = 0
-		while current_frame < self.total_frames:
-			current_frame = get_time_sample(increment)
-			self.value_deltas.append(self.get_race_investment())
-			increment += 1
-
 	def set_value_array(self, units: [Unit]):
-		self.build_array()
 		for _ in units:
 			unit: Unit = _
 
@@ -169,40 +178,40 @@ class PlayerData:
 			if not unit.is_army and not unit.is_worker and not unit.is_building:
 				continue
 
+			# deltas
 			for start, values in unit.type_history.items():
 				start_increment: int = start // get_time_delta()
-				# ignore what we start with
-				if start != 0:
-					self.add_unit_count(self.value_deltas[start_increment], unit, start)
+				unit_count_deltas = self.data[start_increment].unit_count_deltas
+				if start != 0:  # ignore what we start with
+					self.add_unit_count(unit_count_deltas, unit, start)
 
-			tick_investments: Investments = self.get_race_investment()
-			if is_army(unit):
-				tick_investments.army += unit_value(unit)
-			if is_worker(unit):
-				tick_investments.worker += unit_value(unit)
-			if is_expand(unit):
-				tick_investments.expand += 400  # unit_value(unit)
-			if is_production(unit):
-				tick_investments.production += unit_value(unit)
-
-			# process this unit over time
 			increment: int = int(0)
 			current_frame = 0
+			added = False
 			while current_frame < self.total_frames:
-				current_frame = get_time_sample(increment)
-
+				current_frame = get_frame(increment + 1)
+				# because we check against current frame and not next frame, we actually check if a unit existed
+				# at the beginning of this increment, and not th end
 				if unit_exists(unit, current_frame):
-					target_investments: Investments = self.value_over_time[increment]
-					target_investments = target_investments.plus(tick_investments)
+					added = True
 
-					if not self.add_unit_count(target_investments, unit, current_frame):
+					# core
+					core_values: CoreInvestments = self.data[increment].core_values
+					self.add_core(unit, core_values)
+
+					# counts
+					unit_count: Investments = self.data[increment].unit_count
+					additional_count: Investments = self.get_race_investment()
+					if not self.add_unit_count(additional_count, unit, current_frame):
 						break
+					self.data[increment].unit_count = unit_count.plus(additional_count)
 
-					self.value_over_time[increment] = target_investments
+				elif added:  # it doesnt exist and it existed in the past
+					break  # so we can stop
 
 				increment += 1
 
-	def add_unit_count(self, target_investments: Investments, unit: Unit, current_frame) -> bool:
+	def add_unit_count(self, target_investments, unit: Unit, current_frame) -> bool:
 		unit_type: str = fix_name(get_unit_name(unit, current_frame).upper())
 		if unit_type != "" and hasattr(target_investments, unit_type):
 			setattr(target_investments, unit_type, getattr(target_investments, unit_type) + 1)
@@ -210,35 +219,42 @@ class PlayerData:
 		else:
 			return False
 
+	def add_core(self, unit: Unit, value_counts: CoreInvestments):
+		if is_army(unit):
+			value_counts.army += unit_value(unit)
+		if is_worker(unit):
+			value_counts.worker += unit_value(unit)
+		if is_expand(unit):
+			value_counts.expand += 400  # unit_value(unit)
+		if is_production(unit):
+			value_counts.production += unit_value(unit)
+
 	def get_race_investment(self):
 		ValueError("You called get_race_investment on the base class!")
 
 
 class TerranData(PlayerData):
-	value_over_time = [TerranInvestments]
 
 	def __init__(self, vals):
 		super(TerranData, self).__init__(vals)
 
-	def get_race_investment(self) -> Investments:
+	def get_race_investment(self) -> TerranInvestments:
 		return TerranInvestments()
 
 
 class ZergData(PlayerData):
-	value_over_time = [ZergInvestments]
 
 	def __init__(self, vals):
 		super(ZergData, self).__init__(vals)
 
-	def get_race_investment(self) -> Investments:
+	def get_race_investment(self) -> ZergInvestments:
 		return ZergInvestments()
 
 
 class ProtossData(PlayerData):
-	value_over_time = [ProtossInvestments]
 
 	def __init__(self, vals):
 		super(ProtossData, self).__init__(vals)
 
-	def get_race_investment(self) -> Investments:
+	def get_race_investment(self) -> ProtossInvestments:
 		return ProtossInvestments()
