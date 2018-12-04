@@ -48,28 +48,23 @@ class ValueCalculator:
 		return count
 
 	def calc_army(self) -> int:
-		count = 0
-
-		count += self.calc_unit_sum(Unit.MARINE)
-
-		return count
+      # make this const
+      unit_types = [Unit.MARINE]  # ...
+		return sum([self.calc_unit_sum(u) for u in unit_types])
 
 	def calc_expands(self) -> int:
 		"""
 		TODO: should this use the api to get expand count?
 		https://github.com/Dentosal/python-sc2/wiki/The-BotAI-class
 		"""
-		count = 0
-
-		count += self.calc_unit_sum(Unit.COMMANDCENTER)
-		count += self.calc_unit_sum(Unit.ORBITALCOMMAND)
-		count += self.calc_unit_sum(Unit.PLANETARYFORTRESS)
-
-		return count
+      expand_types = [Unit.COMMANDCENTER,
+                      Unit.ORBITALCOMMAND,
+                      Unit.PLANETARYFORTRESS]
+		return sum([self.calc_unit_sum(e) for e in expand_types])
 
 	def calc_unit_sum(self, thing) -> int:
 		"""Get the total current resource investment in this unit type."""
-		return sum([self.get_cost_sum(thing) for i in self.bot.units(thing)])
+		return sum([self.get_cost_sum(thing) for _ in self.bot.units(thing)])
 
 	def get_cost_sum(self, item_id: Union[Unit, Upgrade, Ability]) -> int:
 		"""

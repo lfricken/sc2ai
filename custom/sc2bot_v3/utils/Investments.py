@@ -66,7 +66,7 @@ class Investments:
 	def get_new(self) -> "Investments":
 		return self.__class__()
 
-	def __add__(self, other):
+   def __add__(self, other):
 		"""Add another investment to this one."""
 		new_value = self.get_new()
 		new_value.investments = np.add(self.investments, other.investments)
