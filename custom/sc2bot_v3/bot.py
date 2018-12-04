@@ -67,7 +67,7 @@ class BotV2(sc2.BotAI):
 		if depots:
 			depot_placement_positions = {d for d in depot_placement_positions if depots.closest_distance_to(d) > 1}
 
-      # Lower any supply depot with no enemies near
+		# Lower any supply depot with no enemies near
 		for depot in self.units(UnitType.SUPPLYDEPOT).ready:
 			for unit in self.known_enemy_units.not_structure:
 				if unit.position.to2.distance_to(depot.position.to2) < 15:

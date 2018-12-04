@@ -49,7 +49,7 @@ class ValueCalculator:
 
 	def calc_army(self) -> int:
       # make this const
-      unit_types = [Unit.MARINE]  # ...
+		unit_types = [Unit.MARINE]  # ...
       return sum([self.calc_unit_sum(u) for u in unit_types])
 
 	def calc_expands(self) -> int:
@@ -57,9 +57,9 @@ class ValueCalculator:
 		TODO: should this use the api to get expand count?
 		https://github.com/Dentosal/python-sc2/wiki/The-BotAI-class
 		"""
-      expand_types = [Unit.COMMANDCENTER,
-                      Unit.ORBITALCOMMAND,
-                      Unit.PLANETARYFORTRESS]
+		expand_types = [Unit.COMMANDCENTER,
+							 Unit.ORBITALCOMMAND,
+							 Unit.PLANETARYFORTRESS]
       return sum([self.calc_unit_sum(e) for e in expand_types])
 
 	def calc_unit_sum(self, thing) -> int:
