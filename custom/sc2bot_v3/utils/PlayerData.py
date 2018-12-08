@@ -128,11 +128,15 @@ class DataPoint:
 	"""We have money in these things during that time."""
 	unit_count_deltas: Investments = None
 	"""We spent money on this during that time."""
+	
+	"""Previous units built. Going up to five atm."""
+	previous_built_units: Investments = None  # most recent previous unit
 
 	def __init__(self, player_data):
 		self.core_values: CoreInvestments = CoreInvestments()
 		self.unit_count: Investments = player_data.get_race_investment()
 		self.unit_count_deltas: Investments = player_data.get_race_investment()
+		self.previous_built_units: Investments = player_data.get_race_investment()
 
 
 class PlayerData:
@@ -164,12 +168,19 @@ class PlayerData:
 			current_frame = get_frame(increment)
 
 		self.set_value_array(vals.player.units)
+		
+		# calc prev built units
+		prev_delta = self.data[0].unit_count_deltas
+		for index in range(len(self.data)):
+			curr_delta = self.data[index].unit_count_deltas
+			if curr_delta.unit_was_built:
+				prev_delta = curr_delta.units_built
+			self.data[index].unit_count_deltas = prev_delta
 
 	def set_value_array(self, units: [Unit]):
-		for _ in units:
-			unit: Unit = _
+		for unit in units:
 
-			if unit is None or unit.name is None:
+			if not unit or not unit.name:
 				continue
 
 			if ignore(unit.name):
@@ -204,7 +215,7 @@ class PlayerData:
 					additional_count: Investments = self.get_race_investment()
 					if not self.add_unit_count(additional_count, unit, current_frame):
 						break
-					self.data[increment].unit_count = unit_count.plus(additional_count)
+					self.data[increment].unit_count = unit_count + additional_count
 
 				elif added:  # it doesnt exist and it existed in the past
 					break  # so we can stop
