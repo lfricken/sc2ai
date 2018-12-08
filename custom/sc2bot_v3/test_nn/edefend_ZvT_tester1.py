@@ -1,8 +1,9 @@
-from typing import Iterator
+import csv
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 import tensorflow as tf
+from typing import Iterator
 
 sys.path.append("..")
 from utils.FileEnumerable import FileEnumerable
@@ -133,7 +134,7 @@ def run_test(target_index=0):
 			# pick the one that has the highest win_pct and print
 			unit_names=[p for p in dir(ZergInvestments) if isinstance(getattr(ZergInvestments, p), property)]
 			highest_wr = 0
-			chosen_units = []
+			chosen_units = {}
 			for unit in unit_names:
 				test_investment = replay_data.us.unit_count.copy()
 				setattr(test_investment, unit, getattr(test_investment, unit) + 1)
@@ -142,12 +143,12 @@ def run_test(target_index=0):
 					np.concatenate([replay_data.us.previous_built_units.investments,
 										 test_investment.investments,
 										 replay_data.them.unit_count.investments]))
-				if prediction[0] > highest_wr:
-					highest_wr = prediction[0]
-					chosen_units = [unit]
-				elif prediction[0] == highest_wr:  # units tied for best choice
-					chosen_units.append(unit)
-			units_to_build.append("{}s: Chosen unit(s) to build next: {}".format(frame*5, chosen_units))
+										 
+				chosen_units[unit] = prediction[0]
+
+			# select 5 highest priority units
+			top_10 = sorted(chosen_units.items(), key=lambda kv: kv[1], reverse=True)[:10]
+			units_to_build.append(["{}s: Top ten unit(s) to build next".format(frame*5)] + top_10)
 
 		# expand.append(replay_data.us.core_values.expand)
 		# worker.append(replay_data.us.core_values.worker)
@@ -160,9 +161,9 @@ def run_test(target_index=0):
 		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 		break
 
-	with open('output.txt', 'w') as f:
-		for item in units_to_build:
-			f.write("%s\n" % item)
+	with open("output.csv", "w") as f:
+		 writer = csv.writer(f)
+		 writer.writerows(units_to_build)
 
 	plot_data(lines_to_plot)
 	plt.show()
