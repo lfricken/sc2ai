@@ -1,12 +1,10 @@
-# trains a neural network with data from the analysis folder
-# you need to generate the analysis data first
-
+# done
 from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
 
-learning_rate = 10
+learning_rate = 50
 total_training_sessions = 500
 
 num_inputs = 1
@@ -17,7 +15,7 @@ num_outputs = 2
 # Data
 def generate_data() -> ([[int]], [[int]]):
 	_input_array = [[1], [0]]
-	_output_array = [[1, 0], [0, 1]]
+	_output_array = [[0.75, 0], [1, 0.5]]
 
 	return _input_array, _output_array
 
@@ -48,9 +46,10 @@ def run():
 	network = tf.layers.dense(inputs=middle_layer, units=num_hidden_1, activation=tf.nn.sigmoid)
 
 	# Define cost and optimizer
-	cost_computation = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type))
+	cost_computation = tf.reduce_mean(tf.losses.mean_squared_error(predictions=network, labels=output_type))
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 
+	# Train the model
 	with tf.Session() as session:
 		session.run(tf.global_variables_initializer())  # randomly initialize network
 

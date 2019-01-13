@@ -1,5 +1,4 @@
-# trains a neural network with data from the analysis folder
-# you need to generate the analysis data first
+# done
 
 from __future__ import print_function
 
@@ -51,6 +50,7 @@ def run():
 	cost_computation = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type))
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 
+	# Train the model
 	with tf.Session() as session:
 		session.run(tf.global_variables_initializer())  # randomly initialize network
 
