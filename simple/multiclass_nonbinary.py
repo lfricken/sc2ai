@@ -1,4 +1,6 @@
-# done
+# inputs N dimensional range (0,1)
+# outputs M dimensional range (0,1) where multiple output values can be any value in the range
+
 from __future__ import print_function
 
 import numpy as np
@@ -22,7 +24,7 @@ def generate_data() -> ([[int]], [[int]]):
 
 # Test Output
 def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder):
-	test_input = [[1], [0]]
+	test_input = [[1]]
 	test_output = session.run(fetches=[network], feed_dict={input_type: test_input})
 	print("Output given {}: {} ".format(test_input, np.around(test_output, decimals=2)))
 
@@ -43,10 +45,11 @@ def run():
 
 	# Construct model
 	middle_layer = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.sigmoid)
-	network = tf.layers.dense(inputs=middle_layer, units=num_hidden_1, activation=tf.nn.sigmoid)
+	network = tf.layers.dense(inputs=middle_layer, units=num_outputs, activation=tf.nn.sigmoid)
 
 	# Define cost and optimizer
-	cost_computation = tf.reduce_mean(tf.losses.mean_squared_error(predictions=network, labels=output_type))
+	# if the individual values are not expected to converge on 1 or 0 cost calculators containing the word sigmoid or softmax are bad
+	cost_computation = tf.losses.mean_squared_error(predictions=network, labels=output_type)
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 
 	# Train the model

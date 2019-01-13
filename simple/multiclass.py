@@ -1,4 +1,5 @@
-# done
+# inputs N dimensional (0,1)
+# outputs M dimensional (0,1) where one or more output values should be 1, and the rest should be 0
 
 from __future__ import print_function
 
@@ -16,23 +17,24 @@ num_outputs = 2
 # Data
 def generate_data() -> ([[int]], [[int]]):
 	_input_array = [[1], [0]]
-	_output_array = [[1, 0], [0, 1]]
+	_output_array = [[1, 1], [0, 1]]
 
 	return _input_array, _output_array
 
 
 # Test Output
 def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder):
-	test_input = [[1], [0]]
+	test_input = [[1]]
 	test_output = session.run(fetches=[network], feed_dict={input_type: test_input})
 	print("Output given {}: {} ".format(test_input, np.around(test_output, decimals=2)))
 
 
 # Test Error
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
-	compute_error = tf.losses.mean_squared_error(predictions=network, labels=output_type)
-	error = session.run(fetches=[compute_error], feed_dict={input_type: input_data, output_type: output_data})
-	print("Error {}: {:.2f}".format(before_or_after, error[0]))
+	cost_computation = tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type)
+	cost_computation = tf.reduce_mean(cost_computation)
+	cost = session.run(fetches=[cost_computation], feed_dict={input_type: input_data, output_type: output_data})
+	print("Cost {}: {:.2f}".format(before_or_after, cost[0]))
 
 
 def run():
@@ -44,10 +46,12 @@ def run():
 
 	# Construct model
 	middle_layer = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.sigmoid)
-	network = tf.layers.dense(inputs=middle_layer, units=num_hidden_1, activation=tf.nn.sigmoid)
+	network = tf.layers.dense(inputs=middle_layer, units=num_outputs, activation=tf.nn.sigmoid)
 
 	# Define cost and optimizer
-	cost_computation = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type))
+	# nonsoftmax should be used when the output values should not sum to 1
+	cost_computation = tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type)
+	cost_computation = tf.reduce_mean(cost_computation)
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 
 	# Train the model

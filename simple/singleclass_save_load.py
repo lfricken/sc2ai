@@ -1,4 +1,4 @@
-# done
+# same as singleclass but it tries to load and save the network
 
 from __future__ import print_function
 
@@ -24,7 +24,7 @@ def generate_data() -> ([[int]], [[int]]):
 
 # Test Output
 def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder):
-	test_input = [[1], [0]]
+	test_input = [[1]]
 	test_output = session.run(fetches=[network], feed_dict={input_type: test_input})
 	print("Output given {}: {} ".format(test_input, np.around(test_output, decimals=2)))
 
@@ -32,9 +32,9 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 # Test Error
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
 	compute_correct_prediction = tf.equal(tf.argmax(network), tf.argmax(output_type))
-	accuracy_compute: tf.reduce_mean = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-	error = session.run(fetches=[accuracy_compute], feed_dict={input_type: input_data, output_type: output_data})
-	print("Accuracy {}: {:.2f}%".format(before_or_after, error[0] * 100))
+	accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
+	calculated_accuracy = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
+	print("Accuracy {}: {:.2f}%".format(before_or_after, calculated_accuracy[0] * 100))
 
 
 def run():
@@ -46,7 +46,7 @@ def run():
 
 	# Construct model
 	middle_layer = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.sigmoid)
-	network = tf.layers.dense(inputs=middle_layer, units=num_hidden_1, activation=tf.nn.sigmoid)
+	network = tf.layers.dense(inputs=middle_layer, units=num_outputs, activation=tf.nn.sigmoid)
 
 	# Define cost and optimizer
 	cost_computation = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=output_type))
