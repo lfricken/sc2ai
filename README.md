@@ -9,7 +9,9 @@ Install the following in order:
 * Upon cloning the repository, run `update-packages.bat`, which will update other dependencies used by this repository. It relies on pip working from the command-line.
 
 Setting Up Pycharm:
-* `Open Project > sc2ai dir`
+* File > Import Settings > sc2ai directory > pycharm_settings.jar
+* Open Project > sc2ai directory
 * [Mark the folders inside `\custom` as source root.](https://stackoverflow.com/questions/31432976/pycharm-not-recognizing-packages-even-when-init-py-exits)
-
-
+* Run > Templates > Python > 
+** Target To Run: Script path
+** Python interpreter: Python 3.6.x (pointing at your python.exe file)
