@@ -11,7 +11,7 @@ Install the following in order:
 Setting Up Pycharm:
 * File > Import Settings > sc2ai directory > pycharm_settings.jar
 * Open Project > sc2ai directory
-* [Mark the folders inside `\custom` as source root.](https://stackoverflow.com/questions/31432976/pycharm-not-recognizing-packages-even-when-init-py-exits)
+* [Mark the working folder inside `\custom` as source root.](https://stackoverflow.com/questions/31432976/pycharm-not-recognizing-packages-even-when-init-py-exits) You will want to unmark it if you move to another custom folder.
 * Run > Templates > Python > 
   * Target To Run: Script path
   * Python interpreter: Python 3.6.x (pointing at your python.exe file)
