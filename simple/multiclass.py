@@ -31,7 +31,9 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 
 # Test Error
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
+	# TODO Start Special Code
 	cost_computation = tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type)
+	# TODO End Special Code
 	cost_computation = tf.reduce_mean(cost_computation)
 	cost = session.run(fetches=[cost_computation], feed_dict={input_type: input_data, output_type: output_data})
 	print("Cost {}: {:.2f}".format(before_or_after, cost[0]))
@@ -50,7 +52,9 @@ def run():
 
 	# Define cost and optimizer
 	# nonsoftmax should be used when the output values should not sum to 1
+	# TODO Start Special Code
 	cost_computation = tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_type)
+	# TODO End Special Code
 	cost_computation = tf.reduce_mean(cost_computation)
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 

@@ -32,7 +32,9 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 # Test Error
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
 	# for a single class, we should check accuracy by comparing the index of the greatest value
+	# TODO Start Special Code
 	accuracy = tf.equal(tf.argmax(network), tf.argmax(output_type))
+	# TODO End Special Code
 	accuracy = tf.reduce_mean(tf.cast(accuracy, "float"))
 	calculated_accuracy = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
 	print("Accuracy {}: {:.2f}%".format(before_or_after, calculated_accuracy[0] * 100))
@@ -51,7 +53,9 @@ def run():
 
 	# Define cost and optimizer
 	# softmax should be used when the output values should sum to 1
+	# TODO Start Special Code
 	cost_computation = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=output_type))
+	# TODO End Special Code
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 
 	# Train the model

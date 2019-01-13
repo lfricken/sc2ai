@@ -31,7 +31,9 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 
 # Test Error
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
+	# TODO Start Special Code
 	compute_error = tf.losses.mean_squared_error(predictions=network, labels=output_type)
+	# TODO End Special Code
 	error = session.run(fetches=[compute_error], feed_dict={input_type: input_data, output_type: output_data})
 	print("Error {}: {:.2f}".format(before_or_after, error[0]))
 
@@ -49,7 +51,9 @@ def run():
 
 	# Define cost and optimizer
 	# if the individual values are not expected to converge on 1 or 0 cost calculators containing the word sigmoid or softmax are bad
+	# TODO Start Special Code
 	cost_computation = tf.losses.mean_squared_error(predictions=network, labels=output_type)
+	# TODO End Special Code
 	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 
 	# Train the model
