@@ -43,7 +43,7 @@ class PlotValues:
 
 def plot_data(lines: [PlotValues]):
 	data = dict()
-	data["x"] = np.arange(0, time_delta * len(lines[0].data), time_delta)
+	data["x"] = np.arange(0, time_delta * len(lines[0].data) / 60.0, time_delta / 60.0)
 	for _ in lines:
 		line: PlotValues = _
 		data[line.label] = line.data
@@ -56,7 +56,7 @@ def plot_data(lines: [PlotValues]):
 		col.plot("x", line.label, data=df, marker="", color=line.color, linewidth=2, linestyle=line.style)
 		col.legend()
 
-		col.set_xlabel("Seconds")
+		col.set_xlabel("Minutes")
 		if line.plot == 0:
 			col.set_ylabel("Actual Army Value")
 		if line.plot == 1:
