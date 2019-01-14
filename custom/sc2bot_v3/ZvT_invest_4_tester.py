@@ -55,8 +55,16 @@ def plot_data(lines: [PlotValues]):
 		col = ax[line.plot]
 		col.plot("x", line.label, data=df, marker="", color=line.color, linewidth=2, linestyle=line.style)
 		col.legend()
-		col.set_ylabel("Value")
+
+
 		col.set_xlabel("Seconds")
+		if line.plot == 0:
+			col.set_ylabel("Actual Army Value")
+		if line.plot == 1:
+			col.set_ylabel("Predicted Investment Deltas")
+		if line.plot == 2:
+			col.set_ylabel("Actual Investment Deltas")
+
 
 
 def run_test():
@@ -83,6 +91,7 @@ def run_test():
 			invest_delta = np.subtract(replay_data_next.us.core_values.investments, replay_data.us.core_values.investments)
 			input_data = np.concatenate((replay_data.us.core_values.investments, replay_data.them.core_values.investments))
 			prediction = network.predict(input_data)
+			invest_delta = np.clip(invest_delta, 0, 1000)
 			real1.append(invest_delta[0])
 			real2.append(invest_delta[1])
 			real3.append(invest_delta[2])
