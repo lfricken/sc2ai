@@ -56,7 +56,6 @@ def plot_data(lines: [PlotValues]):
 		col.plot("x", line.label, data=df, marker="", color=line.color, linewidth=2, linestyle=line.style)
 		col.legend()
 
-
 		col.set_xlabel("Seconds")
 		if line.plot == 0:
 			col.set_ylabel("Actual Army Value")
@@ -64,7 +63,6 @@ def plot_data(lines: [PlotValues]):
 			col.set_ylabel("Predicted Investment Deltas")
 		if line.plot == 2:
 			col.set_ylabel("Actual Investment Deltas")
-
 
 
 def run_test():
