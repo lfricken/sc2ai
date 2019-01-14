@@ -1,5 +1,7 @@
 from typing import Iterator
 
+import os
+
 from utils.FileEnumerable import FileEnumerable
 from utils.TrainingData import *
 from utils.Investments import *
@@ -37,4 +39,9 @@ class TrainingValues(Investments):
 	@staticmethod
 	def get_save_directory(num_inputs: int, num_hidden: int, num_outputs: int) -> str:
 		"""Generates the local save path+file for a given network."""
-		return "brains/{}_{}_{}_brain.ckpt".format(num_inputs, num_hidden, num_outputs)
+		return os.path.dirname(os.path.abspath(__file__)) + "/../brains/{}_{}_{}_brain.ckpt".format(num_inputs, num_hidden, num_outputs)
+
+	@staticmethod
+	def get_tensorboard_directory() -> str:
+		"""Generates the local save path+file for a given network."""
+		return os.path.dirname(os.path.abspath(__file__)) + "/tensorboard"

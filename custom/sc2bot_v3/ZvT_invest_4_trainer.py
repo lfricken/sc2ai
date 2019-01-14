@@ -7,18 +7,14 @@ import random
 import tensorflow as tf
 
 from utils.TrainingValues import *
+from ZvT_invest_4_vars import *
 
 percent_train = 0.8  # what percentage of the data do we use to train rather than test?
 learning_rate = 10
-training_epochs = 100
+training_epochs = 40
 num_test_samples = 30
 batch_size = 30
 
-num_inputs = TrainingValues.num_coreinvest_inputs()
-num_hidden_1 = 6
-num_outputs = TrainingValues.num_coreinvest_outputs()
-
-save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 np.set_printoptions(precision=2)
 
 
@@ -111,12 +107,7 @@ def run():
 	print("Class Distribution: {}".format(display_answer))
 
 	# tf Graph input
-	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
-	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
-
-	# Construct model
-	middle_layer = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.sigmoid)
-	network = tf.layers.dense(inputs=middle_layer, units=num_outputs, activation=tf.nn.sigmoid)
+	input_type, network, output_type = build_network()
 
 	# Define loss and optimizer
 	cost_computation = tf.losses.mean_squared_error(predictions=network, labels=output_type)
@@ -138,11 +129,19 @@ def run():
 		print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test before")
 		print_manual_evaluation(session, network, input_type, test_input, test_output)
 
+		# tensorboard
+		tf.summary.scalar("cross_entropy_cost_summary", cost_computation)
+		tf.summary.histogram("output_summary", network)
+		merged = tf.summary.merge_all()
+		train_writer = tf.summary.FileWriter(tensorboard_dir, session.graph)
+
 		print("")
 		print("Training.")
 
 		num_samples = len(train_input)
 		num_batches = num_samples // batch_size
+
+		total_count = 0
 
 		for epoch in range(training_epochs):
 			avg_cost = 0
@@ -151,7 +150,10 @@ def run():
 			batch_begin = 0
 			for batch in range(num_batches):
 				batch_end = batch_begin + batch_size
-				t, cost = session.run(fetches=[trainer, cost_computation], feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
+				summary, t = session.run(fetches=[merged, trainer], feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
+
+				train_writer.add_summary(summary, total_count)
+				total_count += 1
 
 			if epoch % 10 == 0:
 				print("")
