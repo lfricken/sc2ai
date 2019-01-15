@@ -1,8 +1,8 @@
 from utils.TrainingValues import *
 import tensorflow as tf
 
-num_inputs = TrainingValues.num_coreinvest_inputs()
-num_hidden_1 = 12
+num_inputs = TrainingValues.num_coreinvest_outputs()
+num_hidden_1 = 35
 num_outputs = TrainingValues.num_coreinvest_outputs()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()

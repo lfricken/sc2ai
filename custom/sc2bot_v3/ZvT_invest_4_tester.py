@@ -43,13 +43,17 @@ class PlotValues:
 
 def plot_data(lines: [PlotValues]):
 	data = dict()
-	data["x"] = np.arange(0, time_delta * len(lines[0].data) / 60.0, time_delta / 60.0)
+	data["x"] = np.arange(0, time_delta * len(lines[0].data), time_delta)
 	for _ in lines:
 		line: PlotValues = _
 		data[line.label] = line.data
 
 	df = pd.DataFrame(data)
 	fig, ax = plt.subplots(nrows=3, ncols=1)
+
+	for i in range(1, 2):
+		ax[i].set_ylim([0, 1000])
+
 	for _ in lines:
 		line: PlotValues = _
 		col = ax[line.plot]
@@ -67,8 +71,20 @@ def plot_data(lines: [PlotValues]):
 
 def run_test():
 	network = Network()
-	lines_to_plot: [PlotValues] = list()
+
+	num_replays = 1
+	start = 1
+	min_replay = start
+	max_replay = min_replay + num_replays
+
+	count = 0
 	for _ in FileEnumerable.get_analysis_enumerable():
+		count += 1
+		if count < min_replay:
+			continue
+		if count > max_replay:
+			break
+
 		training_data: TrainingData = _
 		real1: [int] = []
 		real2: [int] = []
@@ -104,6 +120,7 @@ def run_test():
 		# worker.append(replay_data.us.core_values.worker)
 		# production.append(replay_data.us.core_values.production)
 
+		lines_to_plot: [PlotValues] = list()
 		lines_to_plot.append(PlotValues("Zerg", "red", "-", army1, 0, "", ""))
 		lines_to_plot.append(PlotValues("Enemy", "blue", "-", army2, 0, "", ""))
 		lines_to_plot.append(PlotValues("Invest Army", "red", "-", p1, 1, "", ""))
@@ -117,10 +134,8 @@ def run_test():
 		# lines_to_plot.append(PlotValues("Production", "green", "--", production))
 		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 
-		break
-
-	plot_data(lines_to_plot)
-	plt.show()
+		plot_data(lines_to_plot)
+		plt.show()
 
 
 run_test()

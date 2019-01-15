@@ -9,10 +9,9 @@ import tensorflow as tf
 from utils.TrainingValues import *
 from ZvT_invest_4_vars import *
 
-percent_train = 0.8  # what percentage of the data do we use to train rather than test?
-learning_rate = 10
+percent_train = 0.9  # what percentage of the data do we use to train rather than test?
+learning_rate = 2
 training_epochs = 40
-num_test_samples = 30
 batch_size = 30
 
 np.set_printoptions(precision=2)
@@ -42,11 +41,19 @@ def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 			invest_delta = np.subtract(data_point_next.us.core_values.investments, data_point.us.core_values.investments)
 			point.inputs = np.concatenate((data_point.us.core_values.investments, data_point.them.core_values.investments))
 
-			if any(i > 0 for i in invest_delta):
-				invest_delta = np.divide(invest_delta, 1000.0)
-				invest_delta = np.clip(invest_delta, 0, 1)
-				point.outputs = invest_delta
-				training_data_array.append(point)
+			invest_delta = np.divide(invest_delta, 1000.0)
+			invest_delta = np.clip(invest_delta, 0, 1)
+
+			# try ignore production and expand values
+			# invest_delta[1] = 0
+			# invest_delta[3] = 0
+			#	point.inputs[1] = 0
+			#	point.inputs[3] = 0
+			#	point.inputs[5] = 0
+			#	point.inputs[7] = 0
+
+			point.outputs = invest_delta
+			training_data_array.append(point)
 
 	randomize_data(training_data_array)
 
