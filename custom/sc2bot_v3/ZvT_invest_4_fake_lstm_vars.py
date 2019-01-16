@@ -9,7 +9,7 @@ num_hidden_1 = 6
 num_outputs = TrainingValues.num_coreinvest_outputs()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
-percent_train = 0.9  # what percentage of the data do we use to train rather than test?
+percent_train = 0.8  # what percentage of the data do we use to train rather than test?
 
 
 class Point:

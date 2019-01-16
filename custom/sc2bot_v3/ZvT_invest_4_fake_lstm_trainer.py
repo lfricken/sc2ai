@@ -8,7 +8,7 @@ import random
 from ZvT_invest_4_fake_lstm_vars import *
 
 learning_rate = 0.1
-training_epochs = 30
+training_epochs = 10
 batch_size = 40
 
 np.set_printoptions(precision=2)

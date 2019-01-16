@@ -44,4 +44,4 @@ class TrainingValues(Investments):
 	@staticmethod
 	def get_tensorboard_directory() -> str:
 		"""Generates the local save path+file for a given network."""
-		return os.path.dirname(os.path.abspath(__file__)) + "\\tensorboard"
+		return os.path.dirname(os.path.abspath(__file__)) + "\\..\\tensorboard"

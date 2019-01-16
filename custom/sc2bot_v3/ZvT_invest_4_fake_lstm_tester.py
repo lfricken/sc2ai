@@ -72,7 +72,7 @@ def plot_data(lines: [PlotValues]):
 def run_test():
 	network = Network()
 
-	num_replays = 3
+	num_replays = 1
 	start = 0
 	min_replay = start
 	max_replay = min_replay + num_replays
