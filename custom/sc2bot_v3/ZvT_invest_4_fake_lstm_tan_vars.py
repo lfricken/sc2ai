@@ -5,7 +5,7 @@ num_lookbacks = int(90 / get_time_delta_seconds())
 
 num_input_investments = 2
 num_inputs = TrainingValues.num_coreinvest_outputs() * (num_input_investments + num_lookbacks)
-num_hidden_1 = 4
+num_hidden_1 = 16
 num_outputs = TrainingValues.num_coreinvest_outputs()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
@@ -25,11 +25,13 @@ def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
-	network = tf.layers.batch_normalization(inputs=input_type, training=is_training)
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.tanh)
+	W1 = tf.Variable(tf.truncated_normal([num_inputs, num_hidden_1]), name='weights1')
+	b1 = tf.Variable(tf.truncated_normal([num_hidden_1]), name='biases1')
+	network = tf.nn.tanh((tf.matmul(input_type, W1) + b1), name='activationLayer1')
 
-	network = tf.layers.batch_normalization(inputs=network, training=is_training)
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.tanh)
+	W2 = tf.Variable(tf.random_normal([num_hidden_1, num_outputs]), name='weights2')
+	b2 = tf.Variable(tf.random_normal([num_outputs]), name='biases2')
+	network = tf.nn.sigmoid((tf.matmul(network, W2) + b2), name='activationLayer2')
 
 	return input_type, network, output_type
 
