@@ -24,8 +24,10 @@ class Point:
 def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
+
 	network = tf.layers.batch_normalization(inputs=input_type, training=is_training)
 	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.tanh)
+
 	network = tf.layers.batch_normalization(inputs=network, training=is_training)
 	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.tanh)
 

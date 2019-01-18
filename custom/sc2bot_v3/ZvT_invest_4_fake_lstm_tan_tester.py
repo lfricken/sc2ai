@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ZvT_invest_4_fake_lstm_vars import *
+from ZvT_invest_4_fake_lstm_tan_vars import *
 
 time_delta = get_time_delta_seconds()
 
@@ -72,7 +72,7 @@ def plot_data(lines: [PlotValues]):
 def run_test():
 	network = Network()
 
-	num_replays = 1
+	num_replays = 20
 	start = 0
 	min_replay = start
 	max_replay = min_replay + num_replays
@@ -138,6 +138,8 @@ def run_test():
 		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 
 		plot_data(lines_to_plot)
+		plt_man = plt.get_current_fig_manager()
+		plt_man.window.wm_geometry("+200+200")
 		plt.show()
 
 

@@ -5,9 +5,9 @@ from __future__ import print_function
 
 import random
 
-from ZvT_invest_4_fake_lstm_vars import *
+from ZvT_invest_4_fake_lstm_tan_vars import *
 
-learning_rate = 0.001
+learning_rate = 0.1
 training_epochs = 10
 batch_size = 10
 
@@ -70,6 +70,7 @@ def run():
 	# Define loss and optimizer
 	cost_computation = tf.losses.mean_squared_error(predictions=network, labels=output_type)
 	trainer = tf.train.AdamOptimizer(learning_rate).minimize(cost_computation)
+	normalize_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
 	saver = tf.train.Saver()
 	with tf.Session() as session:
@@ -108,17 +109,16 @@ def run():
 			batch_begin = 0
 			for batch in range(num_batches):
 				batch_end = batch_begin + batch_size
-				summary, t = session.run(fetches=[merged, trainer], feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
+				summary, t, _, cost = session.run(fetches=[merged, trainer, normalize_op, cost_computation], feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
 
 				train_writer.add_summary(summary, total_count)
 				total_count += 1
+			print("Epoch {} Cost: {}".format(epoch, cost))
 
-			if epoch % 10 == 0:
-				print("")
-				print("Epoch {} Cost: {}".format(epoch, avg_cost))
-				print_accuracy(session, network, train_input, train_output, input_type, output_type, "on training after")
-				print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test after")
-				print_manual_evaluation(session, network, input_type, test_input, test_output)
+			#if epoch % 10 == 0:
+			#	print_accuracy(session, network, train_input, train_output, input_type, output_type, "on training after")
+			#	print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test after")
+			#	print_manual_evaluation(session, network, input_type, test_input, test_output)
 
 		print("")
 		print("Saving.")
