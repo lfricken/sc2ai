@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ZvT_invest_4_fake_lstm_class_vars import *
+from ZvT_invest_4_fake_lstm_vars import *
 
 time_delta = get_time_delta_seconds()
 
@@ -33,7 +33,7 @@ class PlotValues:
 	xlabel: str
 	ylabel: str
 
-	def __init__(self, label, color, style, data, plot, xlabel, ylabel):
+	def __init__(self, label, color, style, data, plot, _xlabel, _ylabel):
 		self.label = label
 		self.color = color
 		self.style = style
@@ -96,9 +96,9 @@ def run_test():
 		p4: [int] = []
 		army1: [int] = []
 		army2: [int] = []
-		expand: [int] = []
-		worker: [int] = []
-		production: [int] = []
+		# expand: [int] = []
+		# worker: [int] = []
+		# production: [int] = []
 
 		training_data_array: [Point] = []
 		extract_data(training_data, training_data_array)

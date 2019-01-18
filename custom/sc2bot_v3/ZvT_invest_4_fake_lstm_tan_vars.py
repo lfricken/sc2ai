@@ -5,7 +5,7 @@ num_lookbacks = int(90 / get_time_delta_seconds())
 
 num_input_investments = 2
 num_inputs = TrainingValues.num_coreinvest_outputs() * (num_input_investments + num_lookbacks)
-num_hidden_1 = 6
+num_hidden_1 = 4
 num_outputs = TrainingValues.num_coreinvest_outputs()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
@@ -25,16 +25,16 @@ def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 	network = tf.layers.batch_normalization(inputs=input_type, training=is_training)
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
+	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.tanh)
 	network = tf.layers.batch_normalization(inputs=network, training=is_training)
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.sigmoid)
+	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.tanh)
 
 	return input_type, network, output_type
 
 
 def extract_data(training_data: TrainingData, training_data_array: [Point]):
 	deltas = []
-	for i in range(num_lookbacks):
+	for i in range(num_lookbacks + 3):
 		deltas.append([0, 0, 0, 0])
 
 	for i in range(len(training_data.data) - 1):
@@ -42,11 +42,8 @@ def extract_data(training_data: TrainingData, training_data_array: [Point]):
 		data_point_next: CombinedDataPoint = training_data.data[i + 1]
 
 		invest_delta = np.subtract(data_point_next.us.core_values.investments, data_point.us.core_values.investments)
-		for _ in range(len(invest_delta)):
-			if invest_delta[_] > 0:
-				invest_delta[_] = 1
-			else:
-				invest_delta[_] = 0
+		invest_delta = np.divide(invest_delta, 1000.0)
+		invest_delta = np.clip(invest_delta, 0, 1)
 
 		# try ignore production and expand values
 		# invest_delta[1] = 0
@@ -56,15 +53,21 @@ def extract_data(training_data: TrainingData, training_data_array: [Point]):
 		#	point.inputs[5] = 0
 		#	point.inputs[7] = 0
 
+		deltas[-1] = np.add(invest_delta, deltas[-1])
+		deltas[-2] = np.add(invest_delta, deltas[-2])
+		deltas[-3] = np.add(invest_delta, deltas[-3])
+		deltas.append(invest_delta)
+		current_delta = deltas[-3]
+
 		point = Point()
-		lookbacks = deltas[-num_lookbacks:]
+		lookbacks = deltas[-(num_lookbacks + 3):-3]
 		lookbacks = np.array(lookbacks).flatten()
+
 		# point.inputs = np.concatenate((data_point.us.core_values.investments, data_point.them.core_values.investments, lookbacks))
-		point.inputs = np.concatenate((lookbacks))
-		point.outputs = invest_delta
+		point.inputs = np.concatenate(([0, 0, 0, 0, 0, 0, 0, 0], lookbacks))
+		point.outputs = current_delta
 
 		training_data_array.append(point)
-		deltas.append(invest_delta)
 
 
 def format_data(training_data_array: [Point]):

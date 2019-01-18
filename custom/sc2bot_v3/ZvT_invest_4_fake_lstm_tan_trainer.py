@@ -5,11 +5,11 @@ from __future__ import print_function
 
 import random
 
-from ZvT_invest_4_fake_lstm_class_vars import *
+from ZvT_invest_4_fake_lstm_vars import *
 
-learning_rate = 0.1
+learning_rate = 0.001
 training_epochs = 10
-batch_size = 40
+batch_size = 10
 
 np.set_printoptions(precision=2)
 
@@ -28,7 +28,7 @@ def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 	return format_data(training_data_array)
 
 
-formatter = "%.2f"
+formatter = "%.4f"
 
 
 def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder, test_input: [[int]], test_answer: [[int]]):
@@ -126,3 +126,4 @@ def run():
 
 
 run()
+# os.system("python C:\\dev\\sc2ai\\custom\\sc2bot_v3\\ZvT_invest_4_fake_lstm_tester.py")

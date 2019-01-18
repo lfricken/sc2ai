@@ -7,9 +7,9 @@ import random
 
 from ZvT_invest_4_fake_lstm_vars import *
 
-learning_rate = 0.1
-training_epochs = 10
-batch_size = 40
+learning_rate = 0.001
+training_epochs = 30
+batch_size = 20
 
 np.set_printoptions(precision=2)
 
@@ -28,7 +28,7 @@ def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 	return format_data(training_data_array)
 
 
-formatter = "%.2f"
+formatter = "%.4f"
 
 
 def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder, test_input: [[int]], test_answer: [[int]]):
@@ -65,11 +65,12 @@ def run():
 	print("Class Distribution: {}".format(display_answer))
 
 	# tf Graph input
-	input_type, network, output_type = build_network()
+	input_type, network, output_type = build_network(True)
 
 	# Define loss and optimizer
 	cost_computation = tf.losses.mean_squared_error(predictions=network, labels=output_type)
 	trainer = tf.train.AdamOptimizer(learning_rate).minimize(cost_computation)
+	normalize_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
 	saver = tf.train.Saver()
 	with tf.Session() as session:
@@ -108,7 +109,7 @@ def run():
 			batch_begin = 0
 			for batch in range(num_batches):
 				batch_end = batch_begin + batch_size
-				summary, t = session.run(fetches=[merged, trainer], feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
+				summary, t, _ = session.run(fetches=[merged, trainer, normalize_op], feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
 
 				train_writer.add_summary(summary, total_count)
 				total_count += 1
@@ -126,3 +127,4 @@ def run():
 
 
 run()
+# os.system("python C:\\dev\\sc2ai\\custom\\sc2bot_v3\\ZvT_invest_4_fake_lstm_tester.py")

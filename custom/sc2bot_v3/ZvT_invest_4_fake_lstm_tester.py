@@ -15,7 +15,7 @@ class Network:
 	def __init__(self):
 		self.save_directory = save_directory
 		self.session = tf.Session()
-		(self.input_type, self.network, _) = build_network()
+		(self.input_type, self.network, _) = build_network(False)
 		saver = tf.train.Saver()
 		saver.restore(self.session, self.save_directory)
 
