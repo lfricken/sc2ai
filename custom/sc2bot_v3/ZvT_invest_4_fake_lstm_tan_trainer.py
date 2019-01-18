@@ -7,8 +7,8 @@ import random
 
 from ZvT_invest_4_fake_lstm_tan_vars import *
 
-learning_rate = 0.1
-training_epochs = 5
+learning_rate = 0.2
+training_epochs = 20
 batch_size = 20
 
 np.set_printoptions(precision=2)
@@ -24,8 +24,7 @@ def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 	for training_data in TrainingValues.get_training_enumerable():
 		extract_data(training_data, training_data_array)
 
-	randomize_data(training_data_array)
-	return format_data(training_data_array)
+	return training_data_array
 
 
 formatter = "%.4f"
@@ -56,7 +55,9 @@ def print_accuracy(session, network, input_data, output_data, input_type, output
 
 
 def run():
-	(train_input, train_output, test_input, test_output) = generate_data()
+	training_data_array = generate_data()
+	randomize_data(training_data_array)
+	(train_input, train_output, test_input, test_output) = format_data(training_data_array)
 
 	class_sums = [sum(x) for x in zip(*train_output)]
 	for i in range(len(class_sums)):
@@ -75,7 +76,7 @@ def run():
 	error = tf.losses.mean_squared_error(predictions=network, labels=output_type)
 
 	cost_computation = tf.add(error, reg_losses)
-	trainer = tf.train.AdamOptimizer(learning_rate).minimize(cost_computation)
+	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
 	normalize_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
 	saver = tf.train.Saver()
@@ -109,6 +110,8 @@ def run():
 		total_count = 0
 
 		for epoch in range(training_epochs):
+			randomize_data(training_data_array)
+			(train_input, train_output, test_input, test_output) = format_data(training_data_array)
 			avg_cost = 0
 			batch_begin = 0
 			for batch in range(num_batches):

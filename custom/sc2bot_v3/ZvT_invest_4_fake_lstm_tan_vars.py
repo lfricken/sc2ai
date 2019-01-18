@@ -5,7 +5,8 @@ num_lookbacks = int(90 / get_time_delta_seconds())
 
 num_input_investments = 2
 num_inputs = TrainingValues.num_coreinvest_outputs() * (num_input_investments + num_lookbacks)
-num_hidden_1 = 4
+num_hidden_1 = 6
+regularize = 0.00001
 num_outputs = TrainingValues.num_coreinvest_outputs()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
@@ -25,7 +26,7 @@ def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
-	reg = tf.contrib.layers.l2_regularizer(scale=0.0006)
+	reg = tf.contrib.layers.l2_regularizer(scale=regularize)
 
 	W1 = tf.get_variable("weights1", [num_inputs, num_hidden_1], regularizer=reg)
 	b1 = tf.get_variable("biases1", [num_hidden_1])
@@ -59,21 +60,16 @@ def extract_data(training_data: TrainingData, training_data_array: [Point]):
 		#	point.inputs[5] = 0
 		#	point.inputs[7] = 0
 
-		deltas[-1] = np.add(invest_delta, deltas[-1])
-		deltas[-2] = np.add(invest_delta, deltas[-2])
-		deltas[-3] = np.add(invest_delta, deltas[-3])
-		deltas.append(invest_delta)
-		current_delta = deltas[-3]
-
 		point = Point()
-		lookbacks = deltas[-(num_lookbacks + 3):-3]
+		lookbacks = deltas[-num_lookbacks:]
 		lookbacks = np.array(lookbacks).flatten()
 
 		# point.inputs = np.concatenate((data_point.us.core_values.investments, data_point.them.core_values.investments, lookbacks))
 		point.inputs = np.concatenate(([0, 0, 0, 0, 0, 0, 0, 0], lookbacks))
-		point.outputs = current_delta
+		point.outputs = invest_delta
 
 		training_data_array.append(point)
+		deltas.append(invest_delta)
 
 
 def format_data(training_data_array: [Point]):

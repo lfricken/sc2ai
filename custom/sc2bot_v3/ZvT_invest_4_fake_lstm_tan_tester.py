@@ -3,6 +3,12 @@ import pandas as pd
 
 from ZvT_invest_4_fake_lstm_tan_vars import *
 
+test_only = False
+
+sub_dir = ""
+if test_only:
+	sub_dir = "test"
+
 time_delta = get_time_delta_seconds()
 
 
@@ -78,7 +84,7 @@ def run_test():
 	max_replay = min_replay + num_replays
 
 	count = 0
-	for _ in FileEnumerable.get_analysis_enumerable("test"):
+	for _ in FileEnumerable.get_analysis_enumerable(sub_dir):
 		count += 1
 		if count < min_replay:
 			continue
