@@ -25,13 +25,13 @@ def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
-	# reg = tf.contrib.layers.l2_regularizer(scale=0.1)
+	reg = tf.contrib.layers.l2_regularizer(scale=0.0)
 
-	W1 = tf.get_variable("weights1", [num_inputs, num_hidden_1])
+	W1 = tf.get_variable("weights1", [num_inputs, num_hidden_1], regularizer=reg)
 	b1 = tf.get_variable("biases1", [num_hidden_1])
 	network = tf.nn.tanh((tf.matmul(input_type, W1) + b1), name='activationLayer1')
 
-	W2 = tf.get_variable("weights2", [num_hidden_1, num_outputs])
+	W2 = tf.get_variable("weights2", [num_hidden_1, num_outputs], regularizer=reg)
 	b2 = tf.get_variable("biases2", [num_outputs])
 	network = tf.nn.tanh((tf.matmul(network, W2) + b2), name='activationLayer2')
 
