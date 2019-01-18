@@ -31,7 +31,7 @@ def build_network(is_training: bool):
 
 	W2 = tf.Variable(tf.random_normal([num_hidden_1, num_outputs]), name='weights2')
 	b2 = tf.Variable(tf.random_normal([num_outputs]), name='biases2')
-	network = tf.nn.sigmoid((tf.matmul(network, W2) + b2), name='activationLayer2')
+	network = tf.nn.tanh((tf.matmul(network, W2) + b2), name='activationLayer2')
 
 	return input_type, network, output_type
 
