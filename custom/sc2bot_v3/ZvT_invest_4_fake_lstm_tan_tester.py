@@ -78,7 +78,7 @@ def run_test():
 	max_replay = min_replay + num_replays
 
 	count = 0
-	for _ in FileEnumerable.get_analysis_enumerable():
+	for _ in FileEnumerable.get_analysis_enumerable("test"):
 		count += 1
 		if count < min_replay:
 			continue

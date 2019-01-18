@@ -19,16 +19,18 @@ class FileEnumerable:
 		return num_files
 
 	@staticmethod
-	def get_analysis_enumerable() -> Iterator[TrainingData]:
+	def get_analysis_enumerable(additional_dir: str = "") -> Iterator[TrainingData]:
 		"""Loops over analysis data and returns each TrainingData."""
 		extension = ".pkl"
 		file_count = FileEnumerable.get_file_count(Directories.analysis(), extension)
 
 		print("{} {} files in directory".format(file_count, extension))
 
-		for filename in os.listdir(Directories.analysis()):
+		target_directory = os.path.join(Directories.analysis(), additional_dir)
+
+		for filename in os.listdir(target_directory):
 			if filename.endswith(extension):
-				with open(os.path.join(Directories.analysis(), filename), "rb") as infile:
+				with open(os.path.join(target_directory, filename), "rb") as infile:
 					analysis_data: TrainingData = pickle.load(infile)
 					yield analysis_data
 

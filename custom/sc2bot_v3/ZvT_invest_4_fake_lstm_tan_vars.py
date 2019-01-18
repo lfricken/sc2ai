@@ -5,7 +5,7 @@ num_lookbacks = int(90 / get_time_delta_seconds())
 
 num_input_investments = 2
 num_inputs = TrainingValues.num_coreinvest_outputs() * (num_input_investments + num_lookbacks)
-num_hidden_1 = 6
+num_hidden_1 = 4
 num_outputs = TrainingValues.num_coreinvest_outputs()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
@@ -25,7 +25,7 @@ def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
-	reg = tf.contrib.layers.l2_regularizer(scale=0.001)
+	reg = tf.contrib.layers.l2_regularizer(scale=0.0006)
 
 	W1 = tf.get_variable("weights1", [num_inputs, num_hidden_1], regularizer=reg)
 	b1 = tf.get_variable("biases1", [num_hidden_1])
