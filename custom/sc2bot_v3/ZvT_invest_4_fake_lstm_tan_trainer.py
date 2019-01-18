@@ -8,7 +8,7 @@ import random
 from ZvT_invest_4_fake_lstm_tan_vars import *
 
 learning_rate = 0.1
-training_epochs = 5
+training_epochs = 15
 batch_size = 20
 
 np.set_printoptions(precision=2)
@@ -110,17 +110,18 @@ def run():
 
 		for epoch in range(training_epochs):
 			avg_cost = 0
-
-			# batches should actually not be all the data
 			batch_begin = 0
 			for batch in range(num_batches):
 				batch_end = batch_begin + batch_size
 				summary, t, _, cost = session.run(fetches=[merged, trainer, normalize_op, cost_computation],
 				                                  feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
 
+				avg_cost += cost
+
 				train_writer.add_summary(summary, total_count)
 				total_count += 1
-			print("Epoch {} Cost: {}".format(epoch, cost))
+			avg_cost = avg_cost / num_batches
+			print("Epoch {} Cost: {}".format(epoch, avg_cost))
 
 		# if epoch % 10 == 0:
 		#	print_accuracy(session, network, train_input, train_output, input_type, output_type, "on training after")
