@@ -33,7 +33,7 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
 	# for a single class, we should check accuracy by comparing the index of the greatest value
 	# TODO Start Special Code
-	accuracy = tf.equal(tf.argmax(network), tf.argmax(output_type))
+	accuracy = tf.equal(tf.argmax(network, axis=1), tf.argmax(output_type, axis=1))
 	# TODO End Special Code
 	accuracy = tf.reduce_mean(tf.cast(accuracy, "float"))
 	calculated_accuracy = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})

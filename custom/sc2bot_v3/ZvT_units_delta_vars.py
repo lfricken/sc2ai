@@ -4,10 +4,10 @@ import tensorflow as tf
 num_lookbacks = int(90 / get_time_delta_seconds())
 
 num_input_investments = 0
-num_inputs = TrainingValues.num_coreinvest_outputs() * (num_input_investments + num_lookbacks)
-num_hidden_1 = 6
+num_inputs = ZergInvestments.num_values()
+num_hidden_1 = 10
 regularize = 0.0001
-num_outputs = TrainingValues.num_coreinvest_outputs()
+num_outputs = ZergInvestments.num_values()
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
 percent_train = 0.8  # what percentage of the data do we use to train rather than test?
@@ -30,46 +30,47 @@ def build_network(is_training: bool):
 
 	W1 = tf.get_variable("weights1", [num_inputs, num_hidden_1], regularizer=None)
 	b1 = tf.get_variable("biases1", [num_hidden_1])
-	network = tf.nn.tanh((tf.matmul(input_type, W1) + b1), name='activationLayer1')
+	network = tf.nn.sigmoid((tf.matmul(input_type, W1) + b1), name='activationLayer1')
 
 	W2 = tf.get_variable("weights2", [num_hidden_1, num_outputs], regularizer=None)
 	b2 = tf.get_variable("biases2", [num_outputs])
-	network = tf.nn.tanh((tf.matmul(network, W2) + b2), name='activationLayer2')
+	network = tf.nn.sigmoid((tf.matmul(network, W2) + b2), name='activationLayer2')
 
 	return input_type, network, output_type
 
 
-def extract_data(training_data: TrainingData, training_data_array: [Point]):
+def extract_data(training_data: TrainingData) -> [Point]:
+	training_data_array: [Point] = []
 	deltas = []
-	for i in range(num_lookbacks + 3):
-		deltas.append([0, 0, 0, 0])
+	for i in range(1):
+		deltas.append(np.zeros((len(training_data.data[i].us.unit_count_deltas.investments))))
 
-	for i in range(len(training_data.data) - 1):
+	for i in range(len(training_data.data)):
 		data_point: CombinedDataPoint = training_data.data[i]
-		data_point_next: CombinedDataPoint = training_data.data[i + 1]
+		purchases = np.clip(data_point.us.unit_count_deltas.investments, a_min=0, a_max=10000)
+		if purchases.any() > 0:
+			deltas.append(purchases)
 
-		invest_delta = np.subtract(data_point_next.us.core_values.investments, data_point.us.core_values.investments)
-		invest_delta = np.divide(invest_delta, 1000.0)
-		invest_delta = np.clip(invest_delta, 0, 1)
+	for i in range(len(deltas) - 1):
+		current: [int] = np.zeros(num_inputs)
+		current[TrainingValues.argmax(deltas[i])] = 1
+		# current[0] = 1
 
-		# try ignore production and expand values
-		# invest_delta[1] = 0
-		# invest_delta[3] = 0
-		#	point.inputs[1] = 0
-		#	point.inputs[3] = 0
-		#	point.inputs[5] = 0
-		#	point.inputs[7] = 0
+		next_: [int] = np.zeros(num_inputs)
+		next_[TrainingValues.argmax(deltas[i + 1])] = 1
+		# next_[0] = 1
 
 		point = Point()
-		lookbacks = deltas[-num_lookbacks:]
-		lookbacks = np.array(lookbacks).flatten()
+		# lookbacks = deltas[-num_lookbacks:]
+		# lookbacks = np.array(lookbacks).flatten()
 
 		# point.inputs = np.concatenate((data_point.us.core_values.investments, data_point.them.core_values.investments))
-		point.inputs = lookbacks  # np.concatenate((lookbacks))
-		point.outputs = invest_delta
+		point.inputs = current
+		point.outputs = next_
 
 		training_data_array.append(point)
-		deltas.append(invest_delta)
+
+	return training_data_array
 
 
 class Normalizer:

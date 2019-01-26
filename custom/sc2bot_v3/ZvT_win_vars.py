@@ -5,14 +5,15 @@ import tensorflow as tf
 
 num_lookbacks = int(0 / get_time_delta_seconds())
 
-num_input_investments = 2
-num_inputs = TrainingValues.num_coreinvest_outputs() * (num_input_investments + num_lookbacks)
-num_hidden_1 = 6
-regularize = 0.0
-num_outputs = TrainingValues.num_coreinvest_outputs()
+num_inputs = 8
+num_hidden_1 = 3
+regularize = 0.0001
+num_outputs = 2
+percent_train = 0.8  # what percentage of the data do we use to train rather than test?
+
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
 tensorboard_dir = TrainingValues.get_tensorboard_directory()
-percent_train = 0.8  # what percentage of the data do we use to train rather than test?
+formatter = "%.4f"
 
 
 class Point:
@@ -24,49 +25,40 @@ class Point:
 		self.outputs = []
 
 
+def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder, test_input: [[int]]):
+	test_output: [[[int]]] = session.run(fetches=[network], feed_dict={input_type: test_input})
+
+	display_input = [formatter % member for member in test_input[0]]
+	display_output = [formatter % member for member in test_output[0][0]]
+
+	print("Input: {}".format(display_input))
+	print("Output:{}".format(display_output))
+
+
 def build_network(is_training: bool):
 	input_type = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
 
 	reg = tf.contrib.layers.l2_regularizer(scale=regularize)
 
-	network = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.sigmoid)
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.tanh)
+	network = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.tanh, kernel_regularizer=reg)
+	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.softmax, kernel_regularizer=reg)
 
 	return input_type, network, output_type
 
 
 def extract_data(training_data: TrainingData, training_data_array: [Point]):
-	deltas = []
-	for i in range(num_lookbacks + 3):
-		deltas.append([0, 0, 0, 0])
-
-	for i in range(len(training_data.data) - 1):
+	for i in range(len(training_data.data)):
 		data_point: CombinedDataPoint = training_data.data[i]
-		data_point_next: CombinedDataPoint = training_data.data[i + 1]
-
-		invest_delta = np.subtract(data_point_next.us.core_values.investments, data_point.us.core_values.investments)
-		invest_delta = np.divide(invest_delta, 1000.0)
-		invest_delta = np.clip(invest_delta, 0, 1)
-
-		# try ignore production and expand values
-		# invest_delta[1] = 0
-		# invest_delta[3] = 0
-		#	point.inputs[1] = 0
-		#	point.inputs[3] = 0
-		#	point.inputs[5] = 0
-		#	point.inputs[7] = 0
 
 		point = Point()
-		lookbacks = deltas[-num_lookbacks:]
-		lookbacks = np.array(lookbacks).flatten()
-
 		point.inputs = np.concatenate((data_point.us.core_values.investments, data_point.them.core_values.investments))
-		point.outputs = invest_delta
+		point.outputs = np.array(data_point.who_won).astype(int)
+
+		# point.inputs = np.roll(point.inputs, len(point.inputs))
+		# point.outputs = np.roll(point.outputs, len(point.outputs))
 
 		training_data_array.append(point)
-		deltas.append(invest_delta)
 
 
 class Normalizer:

@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ZvT_units_delta_vars import *
+from ZvT_win_vars import *
+from utils.TrainingValues import *
 
 test_only = False
 normalize_output = False
+doPrediction = True
 
 sub_dir = ""
 if test_only:
@@ -80,10 +82,34 @@ def plot_data(lines: [PlotValues]):
 			col.set_ylabel("Actual Investment Deltas")
 
 
+def chooser(network: Network, delta: float, current: [int]) -> int:
+	odds = []
+	investment_options = []
+	for i in range(len(current) // 2):
+		investments = np.copy(current)
+		investments[i] += delta
+		result = network.predict(investments)
+		odds.append(result[0])
+		investment_options.append(investments)
+
+	best_pos = TrainingValues.argmax(odds)
+	return investment_options[best_pos]
+
+
 def run_test():
 	network = Network()
+	print_manual_evaluation(network.session, network.network, network.input_type, [[0, 0, 600, 400, 0, 0, 600, 400]])
 
-	num_replays = 3
+	if doPrediction:
+		delta = 50.0
+		investment_order = [[0, 0, 600, 400, 0, 0, 600, 400]]
+
+		for i in range(20):
+			last_invest = investment_order[-1]
+			next_invest = chooser(network, delta, last_invest)
+			investment_order.append(next_invest)
+
+	num_replays = 6
 	start = 0
 	min_replay = start
 	max_replay = min_replay + num_replays
@@ -111,32 +137,33 @@ def run_test():
 		# worker: [int] = []
 		# production: [int] = []
 
-		training_data_array: [Point] = extract_data(training_data)
+		training_data_array: [Point] = []
+		extract_data(training_data, training_data_array)
 		input_data_full, output_data_full, _, _ = format_data(training_data_array)
 
 		input_norm: Normalizer = Normalizer(input_data_full, 0, 2)
 		input_data_full = input_norm.normalize_data(input_data_full)
 
-		output_norm: Normalizer = Normalizer(output_data_full, 0, 2)
-		if normalize_output:
-			output_data_full = output_norm.normalize_data(output_data_full)
+		# output_norm: Normalizer = Normalizer(output_data_full, 0, 2)
+		# if normalize_output:
+		#	output_data_full = output_norm.normalize_data(output_data_full)
 
 		for i in range(len(input_data_full)):
 			input_data = input_data_full[i]
 			output_data = output_data_full[i]
 
 			prediction = network.predict(input_data)
-			if not normalize_output:
-				prediction = output_norm.unnormalize_data(prediction)
+			# if not normalize_output:
+			#	prediction = output_norm.unnormalize_data(prediction)
 
 			real1.append(output_data[0])
 			real2.append(output_data[1])
-			real3.append(output_data[2])
-			real4.append(output_data[3])
+			#			real3.append(output_data[2])
+			#			real4.append(output_data[3])
 			p1.append(prediction[0])
 			p2.append(prediction[1])
-			p3.append(prediction[2])
-			p4.append(prediction[3])
+			#			p3.append(prediction[2])
+			#			p4.append(prediction[3])
 			army1.append(input_data[0])
 			army2.append(input_data[4])
 		# expand.append(replay_data.us.core_values.expand)
@@ -148,12 +175,12 @@ def run_test():
 		lines_to_plot.append(PlotValues("Enemy", "blue", "-", army2, 0, "", ""))
 		lines_to_plot.append(PlotValues("Invest Army", "red", "-", p1, 1, "", ""))
 		lines_to_plot.append(PlotValues("Invest Production", "blue", "-", p2, 1, "", ""))
-		lines_to_plot.append(PlotValues("Invest Worker", "green", "-", p3, 1, "", ""))
-		lines_to_plot.append(PlotValues("Invest Expand", "yellow", "-", p4, 1, "", ""))
+		# lines_to_plot.append(PlotValues("Invest Worker", "green", "-", p3, 1, "", ""))
+		# lines_to_plot.append(PlotValues("Invest Expand", "yellow", "-", p4, 1, "", ""))
 		lines_to_plot.append(PlotValues("Invest Army2", "red", "-", real1, 2, "", ""))
 		lines_to_plot.append(PlotValues("Invest Production2", "blue", "-", real2, 2, "", ""))
-		lines_to_plot.append(PlotValues("Invest Worker2", "green", "-", real3, 2, "", ""))
-		lines_to_plot.append(PlotValues("Invest Expand2", "yellow", "-", real4, 2, "", ""))
+		# lines_to_plot.append(PlotValues("Invest Worker2", "green", "-", real3, 2, "", ""))
+		# lines_to_plot.append(PlotValues("Invest Expand2", "yellow", "-", real4, 2, "", ""))
 		# lines_to_plot.append(PlotValues("Production", "green", "--", production))
 		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 

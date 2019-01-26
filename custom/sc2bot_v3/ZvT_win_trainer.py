@@ -3,27 +3,13 @@
 
 from __future__ import print_function
 
-import random
+from ZvT_win_vars import *
 
-from utils.NetworkValues import *
-
-percent_train = 0.5  # what percentage of the data do we use to train rather than test?
-learning_rate = 10
-training_epochs = 100
-num_test_samples = 30
-
-batch_size = 30
+learning_rate = 0.05
+training_epochs = 3000
+batch_size = 20
 
 np.set_printoptions(precision=2)
-
-
-class Point:
-	inputs: [int] = None
-	outputs: [int] = None
-
-	def __init__(self):
-		self.inputs = []
-		self.outputs = []
 
 
 def randomize_data(data_array):
@@ -33,75 +19,29 @@ def randomize_data(data_array):
 def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 	training_data_array: [Point] = []
 
-	for training_data in get_training_enumerable():
-		for _ in training_data.data:
-			data_point: CombinedDataPoint = _
-			point = Point()
-			start_count = data_point.us.unit_count
-			point.inputs = np.concatenate([start_count.investments, data_point.them.unit_count.investments])
+	for training_data in TrainingValues.get_training_enumerable():
+		extract_data(training_data, training_data_array)
 
-			point.outputs = data_point.who_won
-			training_data_array.append(point)
-
-	randomize_data(training_data_array)
-
-	train_input: [[int]] = []
-	train_output: [[int]] = []
-	test_input: [[int]] = []
-	test_output: [[int]] = []
-
-	num_train = len(training_data_array) * percent_train
-	count = 0
-	for _ in training_data_array:
-		data: Point = _
-		count += 1
-		if count < num_train:
-			train_input.append(data.inputs)
-			train_output.append(data.outputs)
-		else:
-			test_input.append(data.inputs)
-			test_output.append(data.outputs)
-
-	return train_input, train_output, test_input, test_output
-
-
-format = "%.2f"
-
-
-def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeholder, test_input: [[int]],
-                            test_answer: [[int]]):
-	# by just passing network, it implies we want the output from network
-	test_output: [[[int]]] = session.run(fetches=[network], feed_dict={input_type: test_input})
-	case = random.randint(0, len(test_input))
-	test_output = test_output[0][case]
-	test_input = test_input[case]
-	test_answer = test_answer[case]
-
-	display_input = [format % member for member in test_input]
-	display_output = test_output.tolist()
-	output = argmax(display_output)
-	answer = argmax(test_answer)
-	display_output = [format % member for member in display_output]
-	display_answer = [format % member for member in test_answer]
-
-	print("Input:  {}".format(display_input))
-	print("Output:{} {}".format(output, display_output))
-	print("Answer:{} {}".format(answer, display_answer))
+	return training_data_array
 
 
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
-	# Test model
-	# TODO: we need to test with data the network hasn't seen to make sure it's not over-fitting
-	tests = []
-	compute_correct_prediction = tf.equal(tf.argmax(network, 1), tf.argmax(output_type, 1))
-	accuracy: tf.reduce_mean = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
-	accuracy_value = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
-	tests.append(accuracy_value)
-	print("Accuracy {}: {:.2f}%".format(before_or_after, np.mean(tests) * 100))
+	accuracy = tf.equal(tf.argmax(network, axis=1), tf.argmax(output_type, axis=1))
+	accuracy = tf.reduce_mean(tf.cast(accuracy, "float"))
+	calculated_accuracy = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
+	print("Accuracy {}: {:.2f}%".format(before_or_after, calculated_accuracy[0] * 100))
 
 
 def run():
-	(train_input, train_output, test_input, test_output) = generate_data()
+	training_data_array = generate_data()
+	randomize_data(training_data_array)
+	(train_input, train_output, test_input, test_output) = format_data(training_data_array)
+
+	input_norm = Normalizer(train_input, 0, 2)
+	train_input = input_norm.normalize_data(train_input)
+
+	# output_norm = Normalizer(train_output, 0, 2)
+	# train_output = output_norm.normalize_data(train_output)
 
 	class_sums = [sum(x) for x in zip(*train_output)]
 	for i in range(len(class_sums)):
@@ -110,15 +50,18 @@ def run():
 	print("Class Distribution: {}".format(display_answer))
 
 	# tf Graph input
-	input_type = get_input_type()
-	output_type = tf.placeholder(shape=[None, num_outputs], dtype=tf.float32)
-
-	# Construct model
-	network = build_model(input_type)
+	input_type, network, output_type = build_network(True)
 
 	# Define loss and optimizer
-	cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=output_type))
-	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
+
+	regularizer = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
+	reg_losses = tf.reduce_sum(regularizer)
+
+	error = tf.losses.mean_squared_error(predictions=network, labels=output_type)
+
+	cost_computation = tf.add(error, reg_losses)
+	trainer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost_computation)
+	normalize_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
 	saver = tf.train.Saver()
 	with tf.Session() as session:
@@ -134,7 +77,13 @@ def run():
 		print("")
 		print_accuracy(session, network, train_input, train_output, input_type, output_type, "on train before")
 		print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test before")
-		print_manual_evaluation(session, network, input_type, test_input, test_output)
+		print_manual_evaluation(session, network, input_type, test_input)
+
+		# tensorboard
+		tf.summary.scalar("cross_entropy_cost_summary", cost_computation)
+		tf.summary.histogram("output_summary", network)
+		merged = tf.summary.merge_all()
+		train_writer = tf.summary.FileWriter(tensorboard_dir, session.graph)
 
 		print("")
 		print("Training.")
@@ -142,29 +91,30 @@ def run():
 		num_samples = len(train_input)
 		num_batches = num_samples // batch_size
 
-		for epoch in range(training_epochs):
-			avg_cost = 0
+		total_count = 0
 
-			# batches should actually not be all the data
+		for epoch in range(training_epochs):
+			randomize_data(training_data_array)
+			(train_input, train_output, test_input, test_output) = format_data(training_data_array)
+			train_input = input_norm.normalize_data(train_input)
+			avg_cost = 0
 			batch_begin = 0
 			for batch in range(num_batches):
 				batch_end = batch_begin + batch_size
-				# fetches determines what to "compute"
+				summary, t, _, cost = session.run(fetches=[merged, trainer, normalize_op, cost_computation],
+				                                  feed_dict={input_type: train_input[batch_begin:batch_end], output_type: train_output[batch_begin:batch_end]})
 
-				# passing trainer implies you want to compute, and therefor influence, the values of the network
-				t, c = session.run(fetches=[trainer, cost],
-				                   feed_dict={input_type: train_input[batch_begin:batch_end],
-				                              output_type: train_output[batch_begin:batch_end]})
-				avg_cost += c / num_batches
-				batch_begin += batch_size
+				avg_cost += cost
 
-			if epoch % 10 == 0:
-				print("")
-				print("Epoch {} Cost: {}".format(epoch, avg_cost))
-				print_accuracy(session, network, train_input, train_output, input_type, output_type,
-				               "on training after")
-				print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test after")
-				print_manual_evaluation(session, network, input_type, test_input, test_output)
+				train_writer.add_summary(summary, total_count)
+				total_count += 1
+			avg_cost = avg_cost / num_batches
+			print("Epoch {} Cost: {}".format(epoch, avg_cost))
+
+		print("")
+		print_accuracy(session, network, train_input, train_output, input_type, output_type, "on train after")
+		print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test after")
+		print_manual_evaluation(session, network, input_type, test_input)
 
 		print("")
 		print("Saving.")
@@ -172,3 +122,4 @@ def run():
 
 
 run()
+# os.system("python C:\\dev\\sc2ai\\custom\\sc2bot_v3\\ZvT_invest_4_fake_lstm_tester.py")

@@ -31,7 +31,7 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 
 # Test Error
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
-	compute_correct_prediction = tf.equal(tf.argmax(network), tf.argmax(output_type))
+	compute_correct_prediction = tf.equal(tf.argmax(network, axis=1), tf.argmax(output_type, axis=1))
 	accuracy = tf.reduce_mean(tf.cast(compute_correct_prediction, "float"))
 	calculated_accuracy = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
 	print("Accuracy {}: {:.2f}%".format(before_or_after, calculated_accuracy[0] * 100))
