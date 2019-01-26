@@ -4,7 +4,7 @@ import pandas as pd
 from ZvT_win_vars import *
 from utils.TrainingValues import *
 
-test_only = True
+test_only = False
 normalize_output = False
 doPrediction = True
 
