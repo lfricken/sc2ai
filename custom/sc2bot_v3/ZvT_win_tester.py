@@ -4,7 +4,7 @@ import pandas as pd
 from ZvT_win_vars import *
 from utils.TrainingValues import *
 
-test_only = False
+test_only = True
 normalize_output = False
 doPrediction = True
 
@@ -98,21 +98,29 @@ def chooser(network: Network, delta: float, current: [int]) -> int:
 
 def run_test():
 	network = Network()
-	print_manual_evaluation(network.session, network.network, network.input_type, [[0, 0, 600, 400, 0, 0, 600, 400]])
-
-	if doPrediction:
-		delta = 50.0
-		investment_order = [[0, 0, 600, 400, 0, 0, 600, 400]]
-
-		for i in range(20):
-			last_invest = investment_order[-1]
-			next_invest = chooser(network, delta, last_invest)
-			investment_order.append(next_invest)
+	# print_manual_evaluation(network.session, network.network, network.input_type, [[0, 0, 600, 400, 0, 0, 600, 400]])
+	#
+	# if doPrediction:
+	# 	delta = 50.0
+	# 	investment_order = [[0, 0, 600, 400, 0, 0, 600, 400]]
+	#
+	# 	for i in range(20):
+	# 		last_invest = investment_order[-1]
+	# 		next_invest = chooser(network, delta, last_invest)
+	# 		investment_order.append(next_invest)
 
 	num_replays = 6
 	start = 0
 	min_replay = start
 	max_replay = min_replay + num_replays
+
+	training_data_array: [Point] = []
+	for _ in FileEnumerable.get_analysis_enumerable(sub_dir):
+		training_data: TrainingData = _
+		extract_data(training_data, training_data_array)
+
+	input_data_full, output_data_full, _, _ = format_data(training_data_array)
+	input_norm: Normalizer = Normalizer(input_data_full, 0, 2)
 
 	count = 0
 	for _ in FileEnumerable.get_analysis_enumerable(sub_dir):
@@ -141,7 +149,6 @@ def run_test():
 		extract_data(training_data, training_data_array)
 		input_data_full, output_data_full, _, _ = format_data(training_data_array)
 
-		input_norm: Normalizer = Normalizer(input_data_full, 0, 2)
 		input_data_full = input_norm.normalize_data(input_data_full)
 
 		# output_norm: Normalizer = Normalizer(output_data_full, 0, 2)
@@ -157,11 +164,9 @@ def run_test():
 			#	prediction = output_norm.unnormalize_data(prediction)
 
 			real1.append(output_data[0])
-			real2.append(output_data[1])
 			#			real3.append(output_data[2])
 			#			real4.append(output_data[3])
 			p1.append(prediction[0])
-			p2.append(prediction[1])
 			#			p3.append(prediction[2])
 			#			p4.append(prediction[3])
 			army1.append(input_data[0])
@@ -174,11 +179,11 @@ def run_test():
 		lines_to_plot.append(PlotValues("Zerg", "red", "-", army1, 0, "", ""))
 		lines_to_plot.append(PlotValues("Enemy", "blue", "-", army2, 0, "", ""))
 		lines_to_plot.append(PlotValues("Invest Army", "red", "-", p1, 1, "", ""))
-		lines_to_plot.append(PlotValues("Invest Production", "blue", "-", p2, 1, "", ""))
+		#lines_to_plot.append(PlotValues("Invest Production", "blue", "-", p2, 1, "", ""))
 		# lines_to_plot.append(PlotValues("Invest Worker", "green", "-", p3, 1, "", ""))
 		# lines_to_plot.append(PlotValues("Invest Expand", "yellow", "-", p4, 1, "", ""))
 		lines_to_plot.append(PlotValues("Invest Army2", "red", "-", real1, 2, "", ""))
-		lines_to_plot.append(PlotValues("Invest Production2", "blue", "-", real2, 2, "", ""))
+		#lines_to_plot.append(PlotValues("Invest Production2", "blue", "-", real2, 2, "", ""))
 		# lines_to_plot.append(PlotValues("Invest Worker2", "green", "-", real3, 2, "", ""))
 		# lines_to_plot.append(PlotValues("Invest Expand2", "yellow", "-", real4, 2, "", ""))
 		# lines_to_plot.append(PlotValues("Production", "green", "--", production))

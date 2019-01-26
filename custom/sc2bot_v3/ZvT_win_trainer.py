@@ -5,9 +5,9 @@ from __future__ import print_function
 
 from ZvT_win_vars import *
 
-learning_rate = 0.05
-training_epochs = 3000
-batch_size = 20
+learning_rate = 0.2
+training_epochs = 20
+batch_size = 40
 
 np.set_printoptions(precision=2)
 
@@ -26,7 +26,7 @@ def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 
 
 def print_accuracy(session, network, input_data, output_data, input_type, output_type, before_or_after):
-	accuracy = tf.equal(tf.argmax(network, axis=1), tf.argmax(output_type, axis=1))
+	accuracy = tf.equal(tf.math.round(network), output_type)
 	accuracy = tf.reduce_mean(tf.cast(accuracy, "float"))
 	calculated_accuracy = session.run(fetches=[accuracy], feed_dict={input_type: input_data, output_type: output_data})
 	print("Accuracy {}: {:.2f}%".format(before_or_after, calculated_accuracy[0] * 100))
@@ -39,6 +39,7 @@ def run():
 
 	input_norm = Normalizer(train_input, 0, 2)
 	train_input = input_norm.normalize_data(train_input)
+	test_input = input_norm.normalize_data(test_input)
 
 	# output_norm = Normalizer(train_output, 0, 2)
 	# train_output = output_norm.normalize_data(train_output)
@@ -113,6 +114,7 @@ def run():
 
 		print("")
 		print_accuracy(session, network, train_input, train_output, input_type, output_type, "on train after")
+		test_input = input_norm.normalize_data(test_input)
 		print_accuracy(session, network, test_input, test_output, input_type, output_type, "on test after")
 		print_manual_evaluation(session, network, input_type, test_input)
 

@@ -5,10 +5,10 @@ import tensorflow as tf
 
 num_lookbacks = int(0 / get_time_delta_seconds())
 
-num_inputs = 8
-num_hidden_1 = 3
+num_inputs = ZergInvestments.num_values() + TerranInvestments.num_values()
+num_hidden_1 = 8
 regularize = 0.0001
-num_outputs = 2
+num_outputs = 1
 percent_train = 0.8  # what percentage of the data do we use to train rather than test?
 
 save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num_outputs)
@@ -42,7 +42,7 @@ def build_network(is_training: bool):
 	reg = tf.contrib.layers.l2_regularizer(scale=regularize)
 
 	network = tf.layers.dense(inputs=input_type, units=num_hidden_1, activation=tf.nn.tanh, kernel_regularizer=reg)
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.softmax, kernel_regularizer=reg)
+	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.tanh, kernel_regularizer=reg)
 
 	return input_type, network, output_type
 
@@ -52,8 +52,8 @@ def extract_data(training_data: TrainingData, training_data_array: [Point]):
 		data_point: CombinedDataPoint = training_data.data[i]
 
 		point = Point()
-		point.inputs = np.concatenate((data_point.us.core_values.investments, data_point.them.core_values.investments))
-		point.outputs = np.array(data_point.who_won).astype(int)
+		point.inputs = np.concatenate((data_point.us.unit_count.investments, data_point.them.unit_count.investments))
+		point.outputs = np.array([data_point.who_won[0]]).astype(int)
 
 		# point.inputs = np.roll(point.inputs, len(point.inputs))
 		# point.outputs = np.roll(point.outputs, len(point.outputs))
