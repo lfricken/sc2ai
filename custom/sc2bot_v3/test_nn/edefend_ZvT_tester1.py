@@ -143,10 +143,10 @@ def run_test(target_index=0):
 					np.concatenate([replay_data.us.previous_built_units.investments,
 										 test_investment.investments,
 										 replay_data.them.unit_count.investments]))
-										 
+
 				chosen_units[unit] = prediction[0]
 
-			# select 5 highest priority units
+			# select 10 highest priority units
 			top_10 = sorted(chosen_units.items(), key=lambda kv: kv[1], reverse=True)[:10]
 			units_to_build.append(["{}s: Top ten unit(s) to build next".format(frame*5)] + top_10)
 
