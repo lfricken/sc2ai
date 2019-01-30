@@ -26,6 +26,11 @@ class Unit:
 		self.aoe_dps = 0  # dps done to all 4 adjacent cells
 
 	@property
+	def alive(self) -> bool:
+		"""Returns true if this unit is alive."""
+		return self.health >= 0
+
+	@property
 	def position(self) -> (float, float):
 		"""True if this unit can shoot this step."""
 		return self._position

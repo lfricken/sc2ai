@@ -1,8 +1,7 @@
-from Map import *
 from scipy.spatial.distance import cdist
+import numpy as np
 
 from GenerateUnit import *
-import numpy as np
 
 
 class Simulator:
@@ -18,15 +17,14 @@ class Simulator:
 		unit.team = team
 
 		cell: Cell = self.map.grid[position[0]][position[1]]
-		new_space = cell.space_taken + unit.size
-		had_space = new_space <= cell.max_space_taken
+		has_space = cell.will_fit(unit)
 
-		if had_space:
+		if has_space:
 			cell.add_unit(unit)
 			unit.position = position
 			self.units[unit.team].append(unit)
 
-		return had_space
+		return has_space
 
 	def get_cell(self, position: (float, float)) -> Cell:
 		return self.map.grid[position[0]][position[1]]
@@ -45,7 +43,16 @@ class Simulator:
 
 	def apply_attacks(self, time):
 		for unit in self.units[Team.Red]:
+			if not unit.can_shoot:
+				break
 			for eunit in self.units[Team.Blue]:
-				if cdist(np.array([[unit.position[0], unit.position[1]]]), np.array([[eunit.position[0], eunit.position[1]]])) < unit.max_range:
+				if eunit.alive and cdist(np.array([[unit.position[0] * Cell.get_cell_size(), unit.position[1] * Cell.get_cell_size()]]), np.array([[eunit.position[0] * Cell.get_cell_size(), eunit.position[1] * Cell.get_cell_size()]])) < unit.max_range:
+					eunit.health -= unit.dps * time
+					break
+		for unit in self.units[Team.Blue]:
+			if not unit.can_shoot:
+				break
+			for eunit in self.units[Team.Red]:
+				if eunit.alive and cdist(np.array([[unit.position[0] * Cell.get_cell_size(), unit.position[1] * Cell.get_cell_size()]]), np.array([[eunit.position[0] * Cell.get_cell_size(), eunit.position[1] * Cell.get_cell_size()]])) < unit.max_range:
 					eunit.health -= unit.dps * time
 					break

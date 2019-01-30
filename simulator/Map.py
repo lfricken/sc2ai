@@ -32,7 +32,6 @@ class Cell:
 		return Cell.get_cell_size() * Cell.get_cell_size()
 
 	def __init__(self):
-		self.max_space_taken = Cell._get_cell_space()
 		self._space_taken = 0.0
 		self._units: {Team: [Unit]} = {Team.Blue: [], Team.Red: []}
 		self.raised = False
@@ -48,6 +47,10 @@ class Cell:
 
 	void: bool
 	"""This is void (only air units can go here)."""
+
+	def will_fit(self, unit: Unit) -> bool:
+		"""Returns true if this unit will fit in this cell."""
+		return (self._space_taken + unit.size) <= Cell._get_cell_space()
 
 	@property
 	def space_taken(self) -> float:
