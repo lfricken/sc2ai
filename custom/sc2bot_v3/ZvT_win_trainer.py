@@ -5,8 +5,8 @@ from __future__ import print_function
 
 from ZvT_win_vars import *
 
-learning_rate = 0.2
-training_epochs = 20
+learning_rate = 2
+training_epochs = 500
 batch_size = 40
 
 np.set_printoptions(precision=2)

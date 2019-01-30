@@ -7,7 +7,7 @@ num_lookbacks = int(0 / get_time_delta_seconds())
 
 num_inputs = ZergInvestments.num_values() + TerranInvestments.num_values()
 num_hidden_1 = 8
-regularize = 0.0001
+regularize = 0.001
 num_outputs = 1
 percent_train = 0.8  # what percentage of the data do we use to train rather than test?
 
