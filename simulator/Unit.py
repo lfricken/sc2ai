@@ -24,7 +24,6 @@ class Unit:
 		self.has_air_vision_type = False  # True if we can see over cliffs.
 		self.team: Team = Team.Red
 		self.aoe_dps = 0  # dps done to all 4 adjacent cells
-		self.destination = None
 
 	@property
 	def alive(self) -> bool:
