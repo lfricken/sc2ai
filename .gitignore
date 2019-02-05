@@ -127,3 +127,7 @@ simulator/FastSc2Sim/.vs/FastSc2Sim/v15/.suo
 *.db-wal
 *.db-shm
 *.obj
+*.sqlite
+*.lnk
+*.lib
+*.pdb
