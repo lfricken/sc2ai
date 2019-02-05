@@ -1,5 +1,5 @@
 from enum import Enum
-
+from Math import *
 
 class Team(Enum):
 	Red = 1
@@ -17,7 +17,7 @@ class Unit:
 		self._dps = 0
 		self._can_shoot = True  # True if we can shoot this step. False because maybe we moved?
 		self._does_aoe = False  # True if this unit does aoe damage.
-		self._position: (float, float) = (-999, -999)  # current position
+		self._position: VectorInt = VectorInt(-999, -999)  # current position
 		self._size = 0  # amount of a single sc2 cell we take up
 		self.ignores_cliffs = False  # True if we can move over cliffs.
 		self.has_air_movement_type = False  # True if we can move anywhere.
@@ -31,12 +31,12 @@ class Unit:
 		return self.health >= 0
 
 	@property
-	def position(self) -> (float, float):
+	def position(self) -> VectorInt:
 		"""True if this unit can shoot this step."""
 		return self._position
 
 	@position.setter
-	def position(self, value: (float, float)):
+	def position(self, value: VectorInt):
 		"""True if this unit can shoot this step."""
 		self._position = value
 
@@ -52,12 +52,12 @@ class Unit:
 
 	@property
 	def speed(self) -> float:
-		"""How many cells moved per second."""
+		"""How many game units per second."""
 		return self._speed
 
 	@speed.setter
 	def speed(self, value: float):
-		"""How many cells moved per second."""
+		"""How many game units per second."""
 		self._speed = value
 
 	@property
@@ -102,20 +102,20 @@ class Unit:
 
 	@property
 	def min_range(self) -> float:
-		"""How many cells can this unit shoot."""
+		"""How many units can this unit shoot."""
 		return self._min_range
 
 	@min_range.setter
 	def min_range(self, value: float):
-		"""How many cells can this unit shoot."""
+		"""How many units can this unit shoot."""
 		self._min_range = value
 
 	@property
 	def health(self) -> float:
-		"""How many cells can this unit shoot."""
+		"""Health of this unit."""
 		return self._health
 
 	@health.setter
 	def health(self, value: float):
-		"""How many cells can this unit shoot."""
+		"""Health of this unit."""
 		self._health = value

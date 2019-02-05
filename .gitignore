@@ -114,3 +114,13 @@ venv.bak/
 # mypy
 .mypy_cache/
 *.LEON-DESK-2019
+*.opendb
+*.ipch
+*.exe
+*.ilk
+*.pdb
+*.tlog
+*.idb
+*.user
+*.db
+simulator/FastSc2Sim/.vs/FastSc2Sim/v15/.suo
