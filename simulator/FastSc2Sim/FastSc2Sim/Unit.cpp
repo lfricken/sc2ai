@@ -35,7 +35,7 @@ bool Unit::actionHook(Actions action)
 
 void Unit::worldTick(float timeDelta)
 {
-	if (!canShoot)
+	if (!canShoot())
 	{
 		weapon.remainingCooldown -= timeDelta;
 	}

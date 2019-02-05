@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <boost/python.hpp>
 
 
 int main()
@@ -10,8 +11,10 @@ int main()
 	return 0;
 }
 
-
-#include <boost/python.hpp>
+char const* greet()
+{
+	return "hello, world";
+}
 
 BOOST_PYTHON_MODULE(hello_ext)
 {

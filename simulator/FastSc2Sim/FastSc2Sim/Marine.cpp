@@ -29,8 +29,8 @@ bool Marine::actionHook(Actions action)
 	{
 	case Actions::Stimpack:
 		health.health -= 5;
-		break;
-	default:
-		break;
+		return true;
 	}
+
+	return false;
 }
