@@ -131,3 +131,5 @@ simulator/FastSc2Sim/.vs/FastSc2Sim/v15/.suo
 *.lnk
 *.lib
 *.pdb
+*.a
+
