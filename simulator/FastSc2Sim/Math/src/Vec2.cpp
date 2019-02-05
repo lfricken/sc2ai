@@ -9,6 +9,11 @@ namespace Math
 		x = 0.f;
 		y = 0.f;
 	}
+	Vec2::Vec2(Vec2Short vec)
+	{
+		x = static_cast<float>(vec.x);
+		y = static_cast<float>(vec.y);
+	}
 	Vec2::Vec2(float xi, float yi)
 	{
 		x = xi;
@@ -128,7 +133,7 @@ namespace Math
 	}
 	float Vec2::len() const
 	{
-		return Math::sqrt(x*x + y*y);
+		return Math::sqrt(x*x + y * y);
 	}
 	Vec2 Vec2::unit() const
 	{
@@ -137,13 +142,13 @@ namespace Math
 	}
 	Vec2 Vec2::bounce(const Vec2& normal) const
 	{
-		Vec2 u = normal*((*this).dot(normal) / normal.dot(normal));
+		Vec2 u = normal * ((*this).dot(normal) / normal.dot(normal));
 		Vec2 w = *this - u;
 		return w - u;
 	}
 	float Vec2::dot(const Vec2& other) const
 	{
-		return x*other.x + y*other.y;
+		return x * other.x + y * other.y;
 	}
 	float Vec2::toAngle() const
 	{

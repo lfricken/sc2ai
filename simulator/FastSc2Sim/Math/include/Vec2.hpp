@@ -3,10 +3,18 @@
 
 namespace Math
 {
+	class Vec2Short
+	{
+	public:
+		short x;
+		short y;
+	};
+
 	class Vec2
 	{
 	public:
 		Vec2();
+		Vec2(Vec2Short vec);
 		Vec2(float xi, float yi);
 
 		float x;
