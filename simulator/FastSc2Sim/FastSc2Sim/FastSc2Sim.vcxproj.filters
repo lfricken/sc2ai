@@ -27,9 +27,21 @@
     <ClCompile Include="Unit.cpp">
       <Filter>Source Files\Units</Filter>
     </ClCompile>
+    <ClCompile Include="Actions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Marine.cpp">
+      <Filter>Source Files\Units</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unit.hpp">
+      <Filter>Header Files\Units</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Marine.hpp">
       <Filter>Header Files\Units</Filter>
     </ClInclude>
   </ItemGroup>
