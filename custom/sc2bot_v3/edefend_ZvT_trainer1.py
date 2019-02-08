@@ -3,12 +3,12 @@
 
 from __future__ import print_function
 
-import sys
-
 import random
+import sys
 import tensorflow as tf
 from typing import Iterator
 
+from edefend_ZvT_vars1 import *
 from utils.FileEnumerable import FileEnumerable
 from utils.TrainingData import *
 

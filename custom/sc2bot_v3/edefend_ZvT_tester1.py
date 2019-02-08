@@ -4,6 +4,7 @@ import pandas as pd
 import tensorflow as tf
 from typing import Iterator
 
+from edefend_ZvT_vars1 import *
 from utils.FileEnumerable import FileEnumerable
 from utils.TrainingData import *
 from utils.Investments import *
@@ -129,4 +130,4 @@ def run_test(target_index=0):
 	plt.show()
 
 
-run_test()
+run_test(target_index=5)
