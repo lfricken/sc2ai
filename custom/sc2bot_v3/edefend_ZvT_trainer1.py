@@ -4,8 +4,6 @@
 from __future__ import print_function
 
 import sys
-# TODO: package and install this repo so we don't have to deal with relative imports
-# sys.path.append("..")
 
 import random
 import tensorflow as tf
@@ -14,62 +12,10 @@ from typing import Iterator
 from utils.FileEnumerable import FileEnumerable
 from utils.TrainingData import *
 
-num_inputs = ZergInvestments.num_values()*2 + TerranInvestments.num_values()  # prev built units, then unit_count
-num_outputs = 2  # win loss
-split_input_output_count = num_outputs + ((num_inputs - num_outputs) / 2)
-num_hidden_1 = int(split_input_output_count * 1)
-
-save_directory = "brains/{}_{}_{}_sc2bot_v3_brain.ckpt".format(num_inputs, num_hidden_1, num_outputs)
-
-percent_train = 0.5  # what percentage of the data do we use to train rather than test?
 learning_rate = 10
 training_epochs = 100
-num_test_samples = 30
 batch_size = 30
 np.set_printoptions(precision=2)
-
-
-def get_training_enumerable() -> Iterator[TrainingData]:
-	for _ in FileEnumerable.get_analysis_enumerable():
-		yield _
-
-
-def get_input_type() -> tf.placeholder:
-	return tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
-
-
-# Create model
-def add_middle_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
-	return network
-
-
-def add_output_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.sigmoid)
-	return network
-
-
-def add_softmax_layer(network):
-	network = tf.nn.softmax(network)
-	return network
-
-
-def build_model(input_type: tf.placeholder):
-	network = add_middle_layer(input_type)
-	network = add_output_layer(network)
-	network = add_softmax_layer(network)
-	return network
-
-class Point:
-	inputs: [int] = None
-	outputs: [int] = None
-
-	def __init__(self):
-		self.inputs = []
-		self.outputs = []
-
-def argmax(x: [int]) -> int:
-	return max(range(len(x)), key=x.__getitem__)
 
 
 def randomize_data(data_array):
@@ -79,7 +25,7 @@ def randomize_data(data_array):
 def generate_data() -> ([[int]], [[int]], [[int]], [[int]]):
 	training_data_array: [Point] = []
 
-	for training_data in get_training_enumerable():
+	for training_data in TrainingValues.get_training_enumerable():
 		for data_point in training_data.data:
 			point = Point()
 			point.inputs = np.concatenate([data_point.us.previous_built_units.investments,
@@ -124,8 +70,8 @@ def print_manual_evaluation(session: tf.Session, network, input_type: tf.placeho
 
 	display_input = [format % member for member in test_input]
 	display_output = test_output.tolist()
-	output = argmax(display_output)
-	answer = argmax(test_answer)
+	output = TrainingValues.argmax(display_output)
+	answer = TrainingValues.argmax(test_answer)
 	display_output = [format % member for member in display_output]
 	display_answer = [format % member for member in test_answer]
 
