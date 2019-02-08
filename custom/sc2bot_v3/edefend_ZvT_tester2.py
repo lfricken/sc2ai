@@ -1,13 +1,8 @@
 import csv
 import matplotlib.pyplot as plt
 import pandas as pd
-import tensorflow as tf
-from typing import Iterator
 
-from edefend_ZvT_vars1 import *
-from utils.FileEnumerable import FileEnumerable
-from utils.TrainingData import *
-from utils.Investments import *
+from edefend_ZvT_vars2 import *
 
 time_delta = get_time_delta_seconds()
 
@@ -78,44 +73,40 @@ def run_test(target_index=0):
 		worker: [int] = []
 		production: [int] = []
 		units_to_build: [str] = []
-		for frame, replay_data in enumerate(training_data.data):
+		for i in range(len(training_data.data) - 1):
+			replay_data = training_data.data[i]
 			prediction = network.predict(
 				np.concatenate([replay_data.us.previous_built_units.investments,
 									 replay_data.us.unit_count.investments,
 									 replay_data.them.unit_count.investments]))
-			p1.append(prediction[0])
 			army1.append(replay_data.us.core_values.army)
 			army2.append(replay_data.them.core_values.army)
-			
-			# for each possible zerg unit, add to unit_count and predict
-			# pick the one that has the highest win_pct and print
+
+			data_point_next: CombinedDataPoint = training_data.data[i + 1]
+			invest_delta = ZergInvestments()
+			invest_delta.investments = np.subtract(data_point_next.us.unit_count.investments, replay_data.us.unit_count.investments)
+
+			units_built = []
 			unit_names=[p for p in dir(ZergInvestments) if isinstance(getattr(ZergInvestments, p), property)]
-			highest_wr = 0
-			chosen_units = {}
 			for unit in unit_names:
-				test_investment = replay_data.us.unit_count.copy()
-				setattr(test_investment, unit, getattr(test_investment, unit) + 1)
+				if isinstance(getattr(ZergInvestments, unit), property) and getattr(invest_delta, unit) > 0:
+					units_built.append(unit)
 
-				prediction = network.predict(
-					np.concatenate([replay_data.us.previous_built_units.investments,
-										 test_investment.investments,
-										 replay_data.them.unit_count.investments]))
-
-				chosen_units[unit] = prediction[0]
-
-			# select 10 highest priority units
+			chosen_unit_delta = ZergInvestments()
+			chosen_unit_delta.investments = prediction
+			chosen_units = {}
+			unit_names=[p for p in dir(ZergInvestments) if isinstance(getattr(ZergInvestments, p), property)]
+			for unit in unit_names:
+				if isinstance(getattr(ZergInvestments, unit), property) and getattr(chosen_unit_delta, unit) > 0:
+					chosen_units[unit] = getattr(chosen_unit_delta, unit)
 			top_10 = sorted(chosen_units.items(), key=lambda kv: kv[1], reverse=True)[:10]
-			units_to_build.append(["{}s: Top ten unit(s) to build next".format(frame*5)] + top_10)
 
-		# expand.append(replay_data.us.core_values.expand)
-		# worker.append(replay_data.us.core_values.worker)
-		# production.append(replay_data.us.core_values.production)
+			units_to_build.append(["{}s: Chosen Unit(s): ".format(i*5)] + top_10)
+			units_to_build.append(["{}s: Actual Unit(s): ".format(i*5)] + units_built)
+
 
 		lines_to_plot.append(PlotValues("Zerg", "red", "-", army1, 0))
 		lines_to_plot.append(PlotValues("Enemy", "blue", "-", army2, 0))
-		lines_to_plot.append(PlotValues("Odds Zerg Wins", "red", "-", p1, 1))
-		# lines_to_plot.append(PlotValues("Production", "green", "--", production))
-		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 		break
 
 	with open("output.csv", "w") as f:
@@ -126,4 +117,4 @@ def run_test(target_index=0):
 	plt.show()
 
 
-run_test(target_index=5)
+run_test(target_index=0)
