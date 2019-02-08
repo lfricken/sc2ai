@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import sys
 # TODO: package and install this repo so we don't have to deal with relative imports
-sys.path.append("..")
+# sys.path.append("..")
 
 import random
 import tensorflow as tf

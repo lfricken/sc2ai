@@ -5,7 +5,7 @@ import sys
 import tensorflow as tf
 from typing import Iterator
 
-sys.path.append("..")
+# sys.path.append("..")
 from utils.FileEnumerable import FileEnumerable
 from utils.TrainingData import *
 from utils.Investments import *
