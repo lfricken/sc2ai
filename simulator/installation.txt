@@ -1,0 +1,25 @@
+
+
+Directory structure is:
+simulator
+	>FastSc2Sim
+		>FastSc2Sim.sln
+		>Release
+		>Debug
+
+
+Copy .lib and .a files 
+from C:\Users\your___user\AppData\Local\Programs\Python\Python36\libs
+to Release and Debug
+
+
+Install Boost:
+Get boost(1.69.0) from the dependencies folder or https://www.boost.org/users/download/
+
+Build Boost:
+https://codeyarns.com/2014/06/06/how-to-build-boost-using-visual-studio/
+1. Open the Developer Command Prompt for Visual Studio. Change to the directory where Boost is unzipped.
+2. Build the Boost.Build tool (b2.exe) using this command:
+	bootstrap.bat
+3. Build Boost using this compile invocation (for visual studio 2017, 14.1):
+	b2 toolset=msvc-14.1 --build-type=complete --abbreviate-paths architecture=x86 address-model=64 install -j4

@@ -111,5 +111,28 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# replays folder
+/replays
+
 # mypy
 .mypy_cache/
+*.LEON-DESK-2019
+*.opendb
+*.ipch
+*.exe
+*.ilk
+*.pdb
+*.tlog
+*.idb
+*.user
+*.db
+simulator/FastSc2Sim/.vs/FastSc2Sim/v15/.suo
+*.db-wal
+*.db-shm
+*.obj
+*.sqlite
+*.lnk
+*.lib
+*.pdb
+*.a
+

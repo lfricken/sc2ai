@@ -4,6 +4,7 @@
 # 3. write the data to a file
 
 import pickle
+import os
 
 import sc2reader
 from sc2reader.resources import Replay
@@ -11,6 +12,7 @@ from sc2reader.resources import Replay
 from utils.FileEnumerable import FileEnumerable
 from utils.PlayerData import PlayerData
 from utils.TrainingData import TrainingData
+from utils.Directories import Directories
 from mpyq import MPQArchive
 
 
@@ -36,5 +38,7 @@ def process_replay(full_file_path):
 for (replay_file, replay_analysis_file) in FileEnumerable.get_replays_dirs_enumerable():
 	training_data = process_replay(replay_file)
 	if training_data is not None:
+		if not os.path.exists(Directories.analysis()):
+			os.makedirs(Directories.analysis())
 		with open(replay_analysis_file, "wb") as outfile:
 			pickle.dump(training_data, outfile, pickle.HIGHEST_PROTOCOL)

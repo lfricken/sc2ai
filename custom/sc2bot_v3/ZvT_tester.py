@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import tensorflow as tf
 
 from utils.NetworkValues import *
 from utils.TrainingData import *
@@ -32,8 +33,10 @@ class PlotValues:
 	style: str
 	data: [int]
 	plot: int
+	xlabel: str
+	ylabel: str
 
-	def __init__(self, label, color, style, data, plot):
+	def __init__(self, label, color, style, data, plot, xlabel, ylabel):
 		self.label = label
 		self.color = color
 		self.style = style
@@ -81,9 +84,9 @@ def run_test():
 		# worker.append(replay_data.us.core_values.worker)
 		# production.append(replay_data.us.core_values.production)
 
-		lines_to_plot.append(PlotValues("Army1", "red", "-", army1, 0))
-		lines_to_plot.append(PlotValues("Army2", "blue", "-", army2, 0))
-		lines_to_plot.append(PlotValues("Odds", "red", "-", p1, 1))
+		lines_to_plot.append(PlotValues("Zerg", "red", "-", army1, 0))
+		lines_to_plot.append(PlotValues("Enemy", "blue", "-", army2, 0))
+		lines_to_plot.append(PlotValues("Odds Zerg Wins", "red", "-", p1, 1))
 		# lines_to_plot.append(PlotValues("Production", "green", "--", production))
 		# lines_to_plot.append(PlotValues("Expand", "olive", "--", expand))
 

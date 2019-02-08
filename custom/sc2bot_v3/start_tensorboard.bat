@@ -1,0 +1,3 @@
+tensorboard --logdir=%CD%\tensorboard
+
+

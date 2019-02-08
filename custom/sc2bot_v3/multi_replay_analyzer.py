@@ -7,11 +7,13 @@ import pickle
 import os
 
 import sc2reader
+import os
 from sc2reader.resources import Replay
 
 from utils.FileEnumerable import FileEnumerable
 from utils.PlayerData import *
 from utils.TrainingData import TrainingData
+from utils.Directories import Directories
 
 
 def race_win_lose(race_win, race_lose, p1, p2) -> bool:
@@ -70,6 +72,8 @@ for (replay_file, replay_analysis_file) in FileEnumerable.get_replays_dirs_enume
 
 	# start = time.time()
 	if training_data:
+		if not os.path.exists(Directories.analysis()):
+			os.makedirs(Directories.analysis())
 		with open(replay_analysis_file, "wb") as outfile:
 			pickle.dump(training_data, outfile, pickle.HIGHEST_PROTOCOL)
 # end = time.time()
