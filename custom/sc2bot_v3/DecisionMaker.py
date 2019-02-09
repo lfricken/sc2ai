@@ -33,4 +33,4 @@ class DecisionMaker:
 		additional_investment = Investments()
 		additional_investment.investments[index] = Investments.investment_amount()
 
-		return current_investments.plus(additional_investment)
+		return current_investments + additional_investment

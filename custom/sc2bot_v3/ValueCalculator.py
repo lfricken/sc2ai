@@ -20,7 +20,7 @@ class ValueCalculator:
 		"""TODO: do we need to take into account pending buildings? Probably."""
 		"""Returns current investments."""
 		current_investments = Investments()
-		current_investments = current_investments.minus(current_investments)
+		current_investments = current_investments - current_investments
 		current_investments.army = self.calc_army()
 		current_investments.production = self.calc_production()
 		current_investments.expand = self.calc_expands()
@@ -48,31 +48,23 @@ class ValueCalculator:
 		return count
 
 	def calc_army(self) -> int:
-		count = 0
-
-		count += self.calc_unit_sum(Unit.MARINE)
-
-		return count
+      # make this const
+		unit_types = [Unit.MARINE]  # ...
+		return sum([self.calc_unit_sum(u) for u in unit_types])
 
 	def calc_expands(self) -> int:
 		"""
 		TODO: should this use the api to get expand count?
 		https://github.com/Dentosal/python-sc2/wiki/The-BotAI-class
 		"""
-		count = 0
-
-		count += self.calc_unit_sum(Unit.COMMANDCENTER)
-		count += self.calc_unit_sum(Unit.ORBITALCOMMAND)
-		count += self.calc_unit_sum(Unit.PLANETARYFORTRESS)
-
-		return count
+		expand_types = [Unit.COMMANDCENTER,
+							 Unit.ORBITALCOMMAND,
+							 Unit.PLANETARYFORTRESS]
+		return sum([self.calc_unit_sum(e) for e in expand_types])
 
 	def calc_unit_sum(self, thing) -> int:
 		"""Get the total current resource investment in this unit type."""
-		count = 0
-		for _ in self.bot.units(thing):
-			count += self.get_cost_sum(thing)
-		return count
+		return sum([self.get_cost_sum(thing) for _ in self.bot.units(thing)])
 
 	def get_cost_sum(self, item_id: Union[Unit, Upgrade, Ability]) -> int:
 		"""

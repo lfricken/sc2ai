@@ -49,23 +49,41 @@ class Investments:
 	def get_new(self) -> "Investments":
 		return self.__class__()
 
-	def plus(self, other: "Investments") -> "Investments":
+	def __add__(self, other):
 		"""Add another investment to this one."""
 		new_value = self.get_new()
 		new_value.investments = np.add(self.investments, other.investments)
-
 		return new_value
 
-	def minus(self, other: "Investments") -> "Investments":
-		"""Add another investment to this one."""
+	def __sub__(self, other):
+		"""Subtract another investment to this one."""
 		new_value = self.get_new()
 		new_value.investments = np.subtract(self.investments, other.investments)
-
 		return new_value
 
 	def is_less_than_or_equal_to(self, other: "Investments") -> bool:
-		temp = other.minus(self)
+		temp = other - self
 		return (temp.investments >= 0).all()
+
+	def unit_was_built(self) -> bool:
+		for i in self.investments:
+			if i > 0:
+				return True
+		# no units were built
+		return False
+		
+	def units_built(self) -> [int]:
+		"""Return array of units built"""
+		units_built = self.get_new()
+		for index, val in enumerate(self.investments):
+			if i > 0:
+				units_built[index] = self.investments[index]
+		return units_built
+		
+	def copy(self):
+		new_investments = self.get_new()
+		new_investments.investments = np.copy(self.investments)
+		return new_investments
 
 
 class CoreInvestments(Investments):
