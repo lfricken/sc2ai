@@ -9,8 +9,8 @@ import sc2reader
 from sc2reader.data import Unit
 from sc2reader.resources import Replay
 
-from utils.FileEnumerable import FileEnumerable
-from utils.Investments import in_exceptions, fix_name
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.Investments import in_exceptions, fix_name
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 terran = dict()

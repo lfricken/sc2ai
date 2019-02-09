@@ -1,4 +1,4 @@
-from utils.TrainingValues import *
+from sc2ai.utils.TrainingValues import *
 import tensorflow as tf
 
 num_lookbacks = int(90 / get_time_delta_seconds())

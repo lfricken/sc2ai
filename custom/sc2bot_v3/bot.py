@@ -8,22 +8,22 @@ from sc2.game_data import *
 from sc2.player import Bot, Computer
 from sc2.unit import Unit
 
-from DecisionMaker import DecisionMaker
-from DecisionTaker import DecisionTaker
-from GameAnalyst import GameAnalyst
-from Tactician import Tactician
-from ValueCalculator import ValueCalculator
-from utils.Directories import Directories
-from utils.FileEnumerable import FileEnumerable
-from utils.Investments import Investments
+from sc2ai.DecisionMaker import DecisionMaker
+from sc2ai.DecisionTaker import DecisionTaker
+from sc2ai.GameAnalyst import GameAnalyst
+from sc2ai.Tactician import Tactician
+from sc2ai.ValueCalculator import ValueCalculator
+from sc2ai.utils.Directories import Directories
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.Investments import Investments
 
 
 class BotV2(sc2.BotAI):
 	game_analyst: GameAnalyst = None
-	decision_maker: DecisionMaker = None
-	decision_taker: DecisionTaker = None
-	value_calculator: ValueCalculator = None
-	tactician: Tactician = None
+	decision_maker: sc2ai.DecisionMaker = None
+	decision_taker: sc2ai.DecisionTaker = None
+	value_calculator: sc2ai.ValueCalculator = None
+	tactician: sc2ai.Tactician = None
 
 	target_investments: Investments = None
 

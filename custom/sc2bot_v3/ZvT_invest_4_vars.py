@@ -1,4 +1,4 @@
-from utils.TrainingValues import *
+from sc2ai.utils.TrainingValues import *
 import tensorflow as tf
 
 num_inputs = TrainingValues.num_coreinvest_inputs()

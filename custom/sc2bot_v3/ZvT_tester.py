@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
 
-from utils.NetworkValues import *
-from utils.TrainingData import *
+from sc2ai.utils.NetworkValues import *
+from sc2ai.utils.TrainingData import *
 
 time_delta = get_time_delta_seconds()
 

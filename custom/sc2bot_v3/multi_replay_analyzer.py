@@ -10,10 +10,10 @@ import sc2reader
 import os
 from sc2reader.resources import Replay
 
-from utils.FileEnumerable import FileEnumerable
-from utils.PlayerData import *
-from utils.TrainingData import TrainingData
-from utils.Directories import Directories
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.PlayerData import *
+from sc2ai.utils.TrainingData import TrainingData
+from sc2ai.utils.Directories import Directories
 
 
 def race_win_lose(race_win, race_lose, p1, p2) -> bool:

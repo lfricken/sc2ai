@@ -7,8 +7,8 @@ from typing import Iterator
 
 import tensorflow as tf
 
-from utils.FileEnumerable import FileEnumerable
-from utils.TrainingData import *
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.TrainingData import *
 
 learning_rate = 10
 training_epochs = 100

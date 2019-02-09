@@ -6,7 +6,7 @@ from __future__ import print_function
 import random
 import tensorflow as tf
 
-from utils.TrainingValues import *
+from sc2ai.utils.TrainingValues import *
 from ZvT_invest_4_vars import *
 
 percent_train = 0.9  # what percentage of the data do we use to train rather than test?

@@ -1,4 +1,4 @@
-from utils.Investments import Investments
+from sc2ai.utils.Investments import Investments
 
 
 class DecisionMaker:

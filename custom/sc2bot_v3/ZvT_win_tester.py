@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from ZvT_win_vars import *
-from utils.TrainingValues import *
+from sc2ai.utils.TrainingValues import *
 
 test_only = False
 normalize_output = False
