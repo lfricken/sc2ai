@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import random
 
-from utils.NetworkValues import *
+from sc2ai.utils.NetworkValues import *
 
 percent_train = 0.5  # what percentage of the data do we use to train rather than test?
 learning_rate = 10

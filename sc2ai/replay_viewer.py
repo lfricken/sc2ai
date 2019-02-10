@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from utils.FileEnumerable import FileEnumerable
-from utils.TrainingData import *
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.TrainingData import *
 
 time_delta = get_time_delta_seconds()
 

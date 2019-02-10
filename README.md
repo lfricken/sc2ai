@@ -1,6 +1,9 @@
 # sc2ai
 
 ## Installation:
+Install as package - python setup.py install
+Use files from local repo - python setup.py develop
+
 Install the following in order:
 * [Python 3.6.x](https://www.python.org/downloads/)
 * [pip](https://pip.pypa.io/en/stable/installing/)

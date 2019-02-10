@@ -1,4 +1,4 @@
-from utils.PlayerData import *
+from sc2ai.utils.PlayerData import *
 
 
 class CombinedDataPoint:

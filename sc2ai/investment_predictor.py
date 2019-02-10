@@ -8,10 +8,10 @@ from typing import Iterator
 import numpy as np
 import tensorflow as tf
 
-from utils.FileEnumerable import FileEnumerable
-from utils.Investments import Investments
-from utils.TrainingData import DataPoint
-from utils.TrainingData import TrainingData
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.Investments import Investments
+from sc2ai.utils.TrainingData import DataPoint
+from sc2ai.utils.TrainingData import TrainingData
 
 learning_rate = 0.2
 training_epochs = 60

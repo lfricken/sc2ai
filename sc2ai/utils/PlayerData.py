@@ -1,6 +1,6 @@
 from sc2reader.data import Unit
 
-from utils.Investments import *
+from sc2ai.utils.Investments import *
 
 
 def unit_exists(unit: Unit, frame: int) -> bool:
