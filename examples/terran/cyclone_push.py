@@ -1,10 +1,10 @@
 import random
 
 import sc2
-from sc2 import Race, Difficulty
+from sc2 import Difficulty, Race
 from sc2.constants import *
-from sc2.player import Bot, Computer
-from sc2.player import Human
+from sc2.player import Bot, Computer, Human
+
 
 class ProxyRaxBot(sc2.BotAI):
     def select_target(self):

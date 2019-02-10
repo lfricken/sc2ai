@@ -1,8 +1,9 @@
 import sc2
 from sc2 import Race
-from sc2.player import Human, Bot
+from sc2.player import Bot, Human
 
 from cannon_rush import CannonRushBot
+
 
 def main():
     sc2.run_game(sc2.maps.get("Abyssal Reef LE"), [
