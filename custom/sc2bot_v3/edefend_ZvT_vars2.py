@@ -1,5 +1,6 @@
-from sc2ai.utils.TrainingValues import *
 import tensorflow as tf
+
+from sc2ai.utils.TrainingValues import *
 
 num_inputs = ZergInvestments.num_values()*2 + TerranInvestments.num_values()  # prev built units, then unit_count
 num_outputs = ZergInvestments.num_values()  # win loss

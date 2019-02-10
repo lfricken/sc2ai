@@ -3,17 +3,17 @@
 # 2. analyze every replay in it
 # 3. write the data to a file
 
-import pickle
 import os
+import pickle
 
 import sc2reader
+from mpyq import MPQArchive
 from sc2reader.resources import Replay
 
+from utils.Directories import Directories
 from utils.FileEnumerable import FileEnumerable
 from utils.PlayerData import PlayerData
 from utils.TrainingData import TrainingData
-from utils.Directories import Directories
-from mpyq import MPQArchive
 
 
 def process_replay(full_file_path):

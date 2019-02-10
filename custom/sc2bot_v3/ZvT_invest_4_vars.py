@@ -1,5 +1,6 @@
-from sc2ai.utils.TrainingValues import *
 import tensorflow as tf
+
+from sc2ai.utils.TrainingValues import *
 
 num_inputs = TrainingValues.num_coreinvest_inputs()
 num_hidden_1 = 35

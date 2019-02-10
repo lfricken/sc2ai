@@ -5,8 +5,9 @@ from __future__ import print_function
 
 import random
 import sys
-import tensorflow as tf
 from typing import Iterator
+
+import tensorflow as tf
 
 from edefend_ZvT_vars1 import *
 from sc2ai.utils.FileEnumerable import FileEnumerable

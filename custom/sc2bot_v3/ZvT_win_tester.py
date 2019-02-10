@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ZvT_win_vars import *
 from sc2ai.utils.TrainingValues import *
+from ZvT_win_vars import *
 
 test_only = False
 normalize_output = False

@@ -3,17 +3,16 @@
 # 2. analyze every replay in it
 # 3. write the data to a file
 
-import pickle
 import os
+import pickle
 
 import sc2reader
-import os
 from sc2reader.resources import Replay
 
+from sc2ai.utils.Directories import Directories
 from sc2ai.utils.FileEnumerable import FileEnumerable
 from sc2ai.utils.PlayerData import *
 from sc2ai.utils.TrainingData import TrainingData
-from sc2ai.utils.Directories import Directories
 
 
 def race_win_lose(race_win, race_lose, p1, p2) -> bool:

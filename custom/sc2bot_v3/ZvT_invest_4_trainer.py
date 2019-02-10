@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import random
+
 import tensorflow as tf
 
 from sc2ai.utils.TrainingValues import *

@@ -12,10 +12,10 @@ from sc2ai.DecisionMaker import DecisionMaker
 from sc2ai.DecisionTaker import DecisionTaker
 from sc2ai.GameAnalyst import GameAnalyst
 from sc2ai.Tactician import Tactician
-from sc2ai.ValueCalculator import ValueCalculator
 from sc2ai.utils.Directories import Directories
 from sc2ai.utils.FileEnumerable import FileEnumerable
 from sc2ai.utils.Investments import Investments
+from sc2ai.ValueCalculator import ValueCalculator
 
 
 class BotV2(sc2.BotAI):

@@ -12,10 +12,10 @@ from DecisionMaker import DecisionMaker
 from DecisionTaker import DecisionTaker
 from GameAnalyst import GameAnalyst
 from Tactician import Tactician
-from ValueCalculator import ValueCalculator
 from utils.Directories import Directories
 from utils.FileEnumerable import FileEnumerable
 from utils.Investments import Investments
+from ValueCalculator import ValueCalculator
 
 
 class BotV2(sc2.BotAI):

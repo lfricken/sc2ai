@@ -10,8 +10,7 @@ import tensorflow as tf
 
 from utils.FileEnumerable import FileEnumerable
 from utils.Investments import Investments
-from utils.TrainingData import DataPoint
-from utils.TrainingData import TrainingData
+from utils.TrainingData import DataPoint, TrainingData
 
 learning_rate = 10
 training_epochs = 4

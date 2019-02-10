@@ -1,10 +1,9 @@
+import os
 from typing import Iterator
 
-import os
-
 from sc2ai.utils.FileEnumerable import FileEnumerable
-from sc2ai.utils.TrainingData import *
 from sc2ai.utils.Investments import *
+from sc2ai.utils.TrainingData import *
 
 
 class TrainingValues(Investments):

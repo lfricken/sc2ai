@@ -1,13 +1,14 @@
 import csv
+from typing import Iterator
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
-from typing import Iterator
 
 from edefend_ZvT_vars1 import *
 from sc2ai.utils.FileEnumerable import FileEnumerable
-from sc2ai.utils.TrainingData import *
 from sc2ai.utils.Investments import *
+from sc2ai.utils.TrainingData import *
 
 time_delta = get_time_delta_seconds()
 

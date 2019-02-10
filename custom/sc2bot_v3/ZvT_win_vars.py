@@ -1,7 +1,7 @@
+import tensorflow as tf
 from tensorflow.python.keras import activations
 
 from sc2ai.utils.TrainingValues import *
-import tensorflow as tf
 
 num_lookbacks = int(0 / get_time_delta_seconds())
 

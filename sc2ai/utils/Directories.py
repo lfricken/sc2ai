@@ -29,6 +29,3 @@ class Directories:
     def replays() -> str:
         """Folder that contains this project's folder."""
         return os.path.join(Directories.root(), "replays")
-
-
-

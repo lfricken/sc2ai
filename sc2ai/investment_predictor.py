@@ -10,8 +10,7 @@ import tensorflow as tf
 
 from sc2ai.utils.FileEnumerable import FileEnumerable
 from sc2ai.utils.Investments import Investments
-from sc2ai.utils.TrainingData import DataPoint
-from sc2ai.utils.TrainingData import TrainingData
+from sc2ai.utils.TrainingData import DataPoint, TrainingData
 
 learning_rate = 0.2
 training_epochs = 60

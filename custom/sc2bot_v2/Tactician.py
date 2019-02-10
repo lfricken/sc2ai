@@ -1,5 +1,4 @@
 import sc2
-
 from sc2.constants import UnitTypeId as UnitType
 from sc2.helpers import ControlGroup
 
