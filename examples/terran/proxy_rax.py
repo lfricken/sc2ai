@@ -55,7 +55,7 @@ class ProxyRaxBot(sc2.BotAI):
 
 def main():
     sc2.run_game(sc2.maps.get("(2)CatalystLE"), [
-		Computer(Race.Zerg, Difficulty.Hard), Human(Race.Terran)
+        Computer(Race.Zerg, Difficulty.Hard), Human(Race.Terran)
     ], realtime=True)
 
 if __name__ == '__main__':

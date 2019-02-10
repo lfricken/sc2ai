@@ -11,35 +11,35 @@ save_directory = TrainingValues.get_save_directory(num_inputs, num_hidden_1, num
 
 
 def get_input_type() -> tf.placeholder:
-	return tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
+    return tf.placeholder(shape=[None, num_inputs], dtype=tf.float32)
 
 
 def add_middle_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
-	return network
+    network = tf.layers.dense(inputs=network, units=num_hidden_1, activation=tf.nn.sigmoid)
+    return network
 
 
 def add_output_layer(network):
-	network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.sigmoid)
-	return network
+    network = tf.layers.dense(inputs=network, units=num_outputs, activation=tf.nn.sigmoid)
+    return network
 
 
 def add_softmax_layer(network):
-	network = tf.nn.softmax(network)
-	return network
+    network = tf.nn.softmax(network)
+    return network
 
 
 def build_model(input_type: tf.placeholder):
-	network = add_middle_layer(input_type)
-	network = add_output_layer(network)
-	network = add_softmax_layer(network)
-	return network
+    network = add_middle_layer(input_type)
+    network = add_output_layer(network)
+    network = add_softmax_layer(network)
+    return network
 
 
 class Point:
-	inputs: [int] = None
-	outputs: [int] = None
+    inputs: [int] = None
+    outputs: [int] = None
 
-	def __init__(self):
-		self.inputs = []
-		self.outputs = []
+    def __init__(self):
+        self.inputs = []
+        self.outputs = []
