@@ -23,7 +23,7 @@ class Directories:
 	def root() -> str:
 		"""Folder that contains this project's folder."""
 		custom_dir = os.path.join(Directories.project(), "..")
-		return os.path.join(custom_dir, "..")
+		return os.path.join(custom_dir, ".")
 
 	@staticmethod
 	def replays() -> str:

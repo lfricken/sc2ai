@@ -2,9 +2,9 @@ from typing import Iterator
 
 import os
 
-from utils.FileEnumerable import FileEnumerable
-from utils.TrainingData import *
-from utils.Investments import *
+from sc2ai.utils.FileEnumerable import FileEnumerable
+from sc2ai.utils.TrainingData import *
+from sc2ai.utils.Investments import *
 
 
 class TrainingValues(Investments):

@@ -2,9 +2,9 @@ import os
 import pickle
 from typing import Iterator
 
-from utils.Directories import Directories
-from utils.ProgressBar import *
-from utils.TrainingData import TrainingData
+from sc2ai.utils.Directories import Directories
+from sc2ai.utils.ProgressBar import *
+from sc2ai.utils.TrainingData import TrainingData
 
 
 class FileEnumerable:
@@ -31,6 +31,8 @@ class FileEnumerable:
 		for filename in os.listdir(target_directory):
 			if filename.endswith(extension):
 				with open(os.path.join(target_directory, filename), "rb") as infile:
+					# import pdb
+					# pdb.set_trace()
 					analysis_data: TrainingData = pickle.load(infile)
 					yield analysis_data
 
