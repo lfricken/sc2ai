@@ -2,9 +2,9 @@
 
 A collection of StarCraft 2 AI written in python. Some will actually attempt to play the game, some use deep learning via Tensorflow to do predictions.
 
-Here is an example of a win prediction model. It was trained on replays and is just based on the number of each unit that a player has. Here is it's prediction over the course of a game. It has no concept of unit location on the map though.
+Here is an example of a win prediction model. It was trained on replays and is just based on the number of each unit that a player has. Here is it's prediction over the course of a game. It has no concept of unit location on the map though. Top graph is in game score aggregate of resources and units. Bottom graph are the estimated odds of winning at each second. Zerg did end up winning this match. I believe the enemy was Terran.
 
-![Failed to load. Click on win_odds_zerg.png.](https://raw.githubusercontent.com/lfricken/sc2ai/master/win_odds_zerg.png "Score is in game score aggregate of resources and units.")
+![Failed to load. Click on win_odds_zerg.png.](https://raw.githubusercontent.com/lfricken/sc2ai/master/win_odds_zerg.png "odds_zerg.png")
 
 ## Installation:
 Install the following in order:
